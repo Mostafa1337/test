@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Patch, Post, Put, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Patch, Post, Put, Query, Res, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiGoneResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { Users } from "../Models/Users.entity";
 import { UsersService } from "../Services/Users.service";
@@ -18,6 +18,7 @@ import { UserCreateDto } from "../Dtos/UserCreate.dto";
 import { UserUpdateDto } from "../Dtos/UserUpdate.dto";
 import { UpdatePasswordDto } from "../Dtos/UpdatePassword.dto";
 import { ResetPassCodeDto, ResetPassCodeReturnDto, ResetPassDto, ResetPassTokenDto } from "../Dtos/ResetPassDtos";
+import { VerifyDto } from "../Dtos/Verify.dto";
 
 @ApiTags('Users')
 @Controller("users")
@@ -33,10 +34,10 @@ export class UsersController{
     async SignUp(@Body() dto:UserCreateDto):Promise<ResponseType<void>>{
         const newUser:Users = await this.mapper.mapAsync(dto,UserCreateDto,Users)
 
-        await this.service.Insert(newUser)
+        const user:Users = await this.service.Insert(newUser)
+        await this.service.SendVerification(user)
 
-
-        return new ResponseType<void>(HttpStatus.CREATED,"Signed up successfully")
+        return new ResponseType<void>(HttpStatus.CREATED,"A verifiation email was sent to your email")
     }
 
     @Post("login")
@@ -47,7 +48,22 @@ export class UsersController{
         @Body() dto:UserLoginDto,
         @Ip() ipAddress:string,
     ):Promise<ResponseType<TokenReturnDto>>{
-        const data:TokenReturnDto = await this.service.Verify(dto,ipAddress);
+        const data:TokenReturnDto = await this.service.Login(dto,ipAddress);
+        return new ResponseType<TokenReturnDto>(HttpStatus.OK,"logged in successfully",data)
+    }
+
+    @Get("verify")
+    @ApiOkResponse({ type:TokenReturnDto })
+    @ApiBadRequestResponse({type: [ClassValidatorExceptionDto]})
+    @ApiNotFoundResponse()
+    @ApiUnauthorizedResponse()
+    @ApiConflictResponse()
+    @ApiGoneResponse()
+    async Verify(
+        @Query() dto:VerifyDto,
+        @Ip() ipAddress:string,
+    ):Promise<ResponseType<TokenReturnDto>>{
+        const data:TokenReturnDto = await this.service.Verify(dto.Email,dto.Token,ipAddress);
         return new ResponseType<TokenReturnDto>(HttpStatus.OK,"logged in successfully",data)
     }
 

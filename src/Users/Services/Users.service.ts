@@ -1,7 +1,7 @@
 import { GenericService } from "src/Common/Generic/GenericService";
 import { Users } from "../Models/Users.entity";
 import { IGenericRepo } from "src/Common/Generic/Contracts/IGenericRepo";
-import { BadRequestException, Inject, Injectable, NotFoundException, Scope } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException, Scope, UnauthorizedException } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
 import { UserLoginDto } from "../Dtos/UserLogin.dto";
 import { AuthService } from "src/AuthModule/Services/Auth.service";
@@ -10,10 +10,12 @@ import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
 import { UserReturnDto } from "../Dtos/UserReturn.dto";
 import { UpdatePasswordDto } from "../Dtos/UpdatePassword.dto";
-import { ResetPassService } from "src/AuthModule/Services/ResetPass.service";
+import { VerificationService } from "src/AuthModule/Services/Verification.service";
 import { INotification } from "src/Common/Generic/Contracts/INotificationService";
 import { ResetPassTokenDto } from "../Dtos/ResetPassDtos";
 import { use } from "passport";
+import { VerificationCacheKeys } from "src/AuthModule/Dtos/VerificationType";
+import { VerifyError } from "../Errors/VerifyError";
 
 @Injectable({scope:Scope.REQUEST})
 export class UsersService extends GenericService<Users>
@@ -23,7 +25,7 @@ export class UsersService extends GenericService<Users>
         @Inject("REPO_USERS")
         private readonly userRepo:IGenericRepo<Users>,
         private readonly authService:AuthService,
-        private readonly resetPassService:ResetPassService,
+        private readonly resetPassService:VerificationService,
         @InjectMapper()
         private readonly mapper:Mapper,
         @Inject(INotification)
@@ -40,7 +42,7 @@ export class UsersService extends GenericService<Users>
         return await super.Insert(dataToInsert)
     }
 
-    async Verify(dataToInsert: UserLoginDto,ipAddress:string): Promise<TokenReturnDto> {
+    async Login(dataToInsert: UserLoginDto,ipAddress:string): Promise<TokenReturnDto> {
         try
         {
             const user:Users = await this.FindByEmail(dataToInsert.Email);
@@ -48,6 +50,11 @@ export class UsersService extends GenericService<Users>
             if(!isUserValid)
             {
                 throw new BadRequestException();
+            }
+            if(!user.VerifyDate)
+            {
+                await this.SendVerification(user)
+                throw new VerifyError()
             }
             const tokenData = await this.authService.SignIn(user,ipAddress)
 
@@ -59,8 +66,30 @@ export class UsersService extends GenericService<Users>
             )
         }catch(err)
         {
-            throw new BadRequestException("The Email or Password is Incorrect");
+            if(err instanceof BadRequestException || err instanceof NotFoundException)
+                throw new BadRequestException("The Email or Password is Incorrect");
+            throw err
         }
+    }
+
+    async SendVerification(user:Users) : Promise<void>
+    {
+        const token = await this.resetPassService.SendToken(user.Email,user.Id,VerificationCacheKeys.SIGNUP)
+        this.notificationService.SendVerifyLink(user.Email,token)
+    }
+
+    async Verify(email:string,token:string,ipAddress:string) : Promise<TokenReturnDto>
+    {
+        const userId:string = await this.resetPassService.VerifyToken(email,token,VerificationCacheKeys.SIGNUP)
+        const user:Users =  await this.Update(userId,{VerifyDate:new Date()})
+        const tokenData = await this.authService.SignIn(user,ipAddress)
+
+        return new TokenReturnDto(
+            tokenData.JWT,
+            tokenData.TokenPayload.CreatedAt,
+            tokenData.TokenPayload.ExpireDate,
+            await this.mapper.mapAsync(user,Users,UserReturnDto)
+        )
     }
 
     async FindByEmail(email:string): Promise<Users> {
@@ -87,19 +116,19 @@ export class UsersService extends GenericService<Users>
 
         if(user)
         {
-            const code:number = await this.resetPassService.GetResetPassCode(user.Email,user.Id);
+            const code:number = await this.resetPassService.SendCode(user.Email,user.Id,VerificationCacheKeys.RESETPASS);
             this.notificationService.SendResetPass(user.Email,code)
         }else{
-            await this.resetPassService.GetResetPassCode(email,null);
+            await this.resetPassService.SendCode(email,null,VerificationCacheKeys.RESETPASS);
         }
     }
 
     async ResetPassVerifyCode(email:string,code:number): Promise<string> {
-       return await this.resetPassService.VerifyResetPassCode(email,code);
+       return await this.resetPassService.VerifyCode(email,code,VerificationCacheKeys.RESETPASS);
     }
 
     async ResetPass(data:ResetPassTokenDto): Promise<void> {
-        const userId:string = await this.resetPassService.VerifyResetPassToken(data.Email,data.Token);
+        const userId:string = await this.resetPassService.VerifyToken(data.Email,data.Token,VerificationCacheKeys.RESETPASS);
 
         const newPassword:string =  await bcrypt.hash(data.NewPassword,await bcrypt.genSalt());
         await this.Update(userId,{Password:newPassword});
