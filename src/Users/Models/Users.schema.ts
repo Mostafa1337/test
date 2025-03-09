@@ -47,11 +47,15 @@ export class UsersSchema extends Schema<Users> {
                     name: "email",
                     unique:true
                 },
-                CountryCode: {
-                    type: "varchar",
-                    length: 5,
-                    nullable: false,
-                    name: "countrycode"
+                IsSuperAdmin:{
+                    type:"boolean",
+                    nullable:false,
+                    default:false
+                },
+                VerifyDate:{
+                    type:"datetime",
+                    nullable:true,
+                    default:null
                 },
                 PhoneNumber: {
                     type: "varchar",
