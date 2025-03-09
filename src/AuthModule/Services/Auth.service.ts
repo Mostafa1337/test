@@ -4,7 +4,6 @@ import { JwtService } from "@nestjs/jwt";
 import { Users } from "src/Users/Models/Users.entity";
 import { TokenPayLoad } from "../Dtos/TokenPayload";
 import { ConfigService } from "@nestjs/config";
-import { ResetPassService } from "./ResetPass.service";
 
 @Injectable({scope:Scope.REQUEST})
 export class AuthService{
@@ -19,7 +18,7 @@ export class AuthService{
         const timeDuration:number = this.configService.getOrThrow<number>("JWTEXPIREDURATION")
         const timeType:string = this.configService.getOrThrow<string>("JWTEXPIREDURATIONTYPE")
 
-        const payload:TokenPayLoad = new TokenPayLoad(user.Id,user.FirstName,user.Email,timeDuration,timeType)
+        const payload:TokenPayLoad = new TokenPayLoad(user.Id,user.FirstName,user.Email,user.IsSuperAdmin,timeDuration,timeType)
         const config = this.jwtConfig.GetConfig()
         const keys = this.jwtConfig.GetKeys()
 

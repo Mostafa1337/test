@@ -5,17 +5,20 @@ export class TokenPayLoad{
 
     readonly CreatedAt:Date = new Date()
 
-    readonly FirstName: string
+    // readonly FirstName: string
 
     readonly Email: string
 
     readonly UserId:string
 
+    readonly IsSuperAdmin:boolean
+
     readonly ExpireDate:Date
 
-    constructor(userId:string,firstName:string,email:string,time:number,durationType:string){
-        this.FirstName = firstName
+    constructor(userId:string,firstName:string,email:string,IsSuperAdmin:boolean,time:number,durationType:string){
+        // this.FirstName = firstName
         this.Email = email
+        this.IsSuperAdmin = this.IsSuperAdmin
         
         switch(durationType)
         {
