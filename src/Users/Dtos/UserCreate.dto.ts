@@ -17,7 +17,8 @@ export class UserCreateDto extends UserUpdateDto
         maxLength: 62,
         type: "string",
         nullable: false,
-        required: true
+        required: true,
+        uniqueItems:true
     })
     @AutoMap()
     Email: string;

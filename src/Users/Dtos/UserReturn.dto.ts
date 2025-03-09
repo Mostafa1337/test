@@ -41,13 +41,6 @@ export class UserReturnDto extends EntityBase{
     })
     @AutoMap()
     PhoneNumber: string;
-    
-    @ApiProperty({
-        name:"CountryCode",
-        type:"string",
-    })
-    @AutoMap()
-    CountryCode: string;
 
     @ApiProperty({
         name:"Usertype",

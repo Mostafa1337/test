@@ -41,7 +41,8 @@ export class UserUpdateDto {
         type:"string",
         nullable:true,
         required:false,
-        default:null
+        default:null,
+        uniqueItems:true
     })
     @AutoMap()
     StudentId?: string = null;
@@ -55,25 +56,10 @@ export class UserUpdateDto {
         nullable: false,
         required: true,
         example: "1203087667",
-        pattern: "/^[0-9]{10}$/"
+        pattern: "/^1[0-9]{10}$/"
     })
     @AutoMap()
     PhoneNumber: string;
-
-    //TODO VALIDATE COUNTRY CODE
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(5)
-    @ApiProperty({
-        name:"CountryCode",
-        type:"string",
-        nullable:false,
-        required:true,
-        example:"+20",
-        pattern:"/^(\+?\d{1,3}|\d{1,4})$/"
-    })
-    @AutoMap()
-    CountryCode: string;
 
 
     @IsEnum(Usertypes)
