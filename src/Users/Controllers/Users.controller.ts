@@ -52,7 +52,7 @@ export class UsersController{
         return new ResponseType<TokenReturnDto>(HttpStatus.OK,"logged in successfully",data)
     }
 
-    @Get("verify")
+    @Post("verify")
     @ApiOkResponse({ type:TokenReturnDto })
     @ApiBadRequestResponse({type: [ClassValidatorExceptionDto]})
     @ApiNotFoundResponse()
@@ -60,7 +60,7 @@ export class UsersController{
     @ApiConflictResponse()
     @ApiGoneResponse()
     async Verify(
-        @Query() dto:VerifyDto,
+        @Body() dto:VerifyDto,
         @Ip() ipAddress:string,
     ):Promise<ResponseType<TokenReturnDto>>{
         const data:TokenReturnDto = await this.service.Verify(dto.Email,dto.Token,ipAddress);
