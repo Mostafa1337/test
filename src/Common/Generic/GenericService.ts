@@ -6,7 +6,6 @@ import { FindOptionsWhere } from "typeorm";
 
 export abstract class GenericService<T extends EntityBase> implements IGenericService<T>
 {
-    ConflictException:string = "Duplicate Entry"
     NotFoundException:string = "Not Found"
 
     constructor(
@@ -92,11 +91,7 @@ export abstract class GenericService<T extends EntityBase> implements IGenericSe
 
     public ErrorFactory(err:any)
     {
-        if(err instanceof ConflictException)
-        {
-            throw new ConflictException(this.ConflictException);
-        }
-        else if(err instanceof NotFoundException)
+        if(err instanceof NotFoundException)
         {
             throw new NotFoundException(this.NotFoundException);
         }
