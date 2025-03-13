@@ -25,7 +25,7 @@ async function bootstrap() {
         HttpStatus.BAD_REQUEST,
         "Please Enter Valid Data",
         validationErrors.map(
-          (error):ClassValidatorExceptionDto => (
+          (error):ClassValidatorExceptionDto<any> => (
             new ClassValidatorExceptionDto(Object.values(error.constraints).join(', '),error.property)
           )),
         "BadRequestException"

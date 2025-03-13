@@ -1,26 +1,26 @@
-import { HttpException } from "@nestjs/common"
+import { HttpException, HttpStatus } from "@nestjs/common"
 import { ApiProperty } from "@nestjs/swagger"
 
-export class ClassValidatorExceptionDto {
+export class ClassValidatorExceptionDto<T> {
 
     @ApiProperty()
     public Error: string
 
     @ApiProperty()
-    public Field: string
+    public Field: keyof T
 
-    constructor(Error: string, Field: string) {
+    constructor(Error: string, Field: keyof T) {
         this.Error = Error
         this.Field = Field
     }
 }
 
-export class BadValidationException extends HttpException 
+export class BadValidationException<T> extends HttpException 
 {
-    constructor(data:ClassValidatorExceptionDto){
-        super({Data:[data]},400)
+    constructor(data:ClassValidatorExceptionDto<T>,statusCode:HttpStatus=HttpStatus.BAD_REQUEST){
+        super({Data:[data]},statusCode)
 
         this.message = "Please Enter Valid Data"
-        this.name = "BadRequestException"
+        this.name = "BadValidationException"
     }
 }
