@@ -21,24 +21,56 @@ export class VerificationService {
         private readonly cacheService: ICacheService
     ) { }
 
+    /**
+     * Sends a verification code to the specified email
+     * @param email - The email address to send the code to
+     * @param userId - The ID of the user requesting the code
+     * @param verifyType - The type of verification from VerificationCacheKeys
+     * @returns Promise<number> - The generated verification code
+     */
     async SendCode(email: string, userId: string, verifyType: VerificationCacheKeys): Promise<number> {
         return await this.SaveVerifyData(email,userId,verifyType,VerificationType.CODE,VerificationDataWithCode) as number
     }
 
+    /**
+     * Generates and sends a verification token
+     * @param email - The email address to associate with the token
+     * @param userId - The ID of the user requesting the token
+     * @param verifyType - The type of verification from VerificationCacheKeys
+     * @returns Promise<string> - The generated verification token
+     */
     async SendToken(email: string, userId: string, verifyType: VerificationCacheKeys): Promise<string> {
         return await this.SaveVerifyData(email,userId,verifyType,VerificationType.TOKEN,VerificationData) as string
     }
 
+    /**
+     * Verifies a submitted code against stored verification data
+     * @param email - The email address associated with the code
+     * @param code - The verification code to validate
+     * @param verifyType - The type of verification from VerificationCacheKeys
+     * @returns Promise<string> - The token generated upon successful verification
+     * @throws UnauthorizedException if code is invalid
+     * @throws GoneException if code is expired
+     */
     async VerifyCode(email: string, code: number, verifyType: VerificationCacheKeys): Promise<string> {
         const oldVerificationData: VerificationDataWithCode = await this.IsValidKey(email, verifyType,VerificationDataWithCode)
 
-        if (!oldVerificationData.IsValidate(code.toString())) {
+        if (!await oldVerificationData.IsValidate(code.toString())) {
             throw this.ResetPassException
         }
 
         return oldVerificationData.GetToken(this.encryptService)
     }
 
+    /**
+     * Verifies a submitted token against stored verification data
+     * @param email - The email address associated with the token
+     * @param token - The token to validate
+     * @param verifyType - The type of verification from VerificationCacheKeys
+     * @returns Promise<string> - The userId associated with the token
+     * @throws UnauthorizedException if token is invalid
+     * @throws GoneException if token is expired
+     */
     async VerifyToken(email: string, token: string, verifyType: VerificationCacheKeys): Promise<string> {
         const oldVerificationData: VerificationData = await this.IsValidKey(email, verifyType,VerificationData)
 
@@ -51,6 +83,16 @@ export class VerificationService {
         return oldVerificationData.UserId;
     }
 
+    /**
+     * Saves verification data and handles retry logic
+     * @param email - The email address for the verification
+     * @param userId - The ID of the user
+     * @param verifyCache - The cache key type
+     * @param verifyType - The type of verification (CODE or TOKEN)
+     * @param type - The class type for verification data
+     * @returns Promise<string | number> - The generated code or token
+     * @throws ConflictException if retry attempt is too soon
+     */
     private async SaveVerifyData<T extends VerificationData>
         (
             email: string,
@@ -87,6 +129,15 @@ export class VerificationService {
         return await this.SaveAndGetCode(email,userId,verifyCache,verifyType);
     }
 
+    /**
+     * Generates and saves new verification data
+     * @param email - The email address for the verification
+     * @param userId - The ID of the user
+     * @param verifyCache - The cache key type
+     * @param verifyType - The type of verification (CODE or TOKEN)
+     * @param reties - Number of retry attempts
+     * @returns Promise<T> - The generated code or token
+     */
     private async SaveAndGetCode<T = string | number>(
         email: string,
         userId: string,
@@ -103,7 +154,7 @@ export class VerificationService {
         {
             verificationData = new VerificationData(userId)
         }
-        const codeOrToken:T = verificationData.GenerateData(this.encryptService) as T;
+        const codeOrToken:T = await verificationData.GenerateData(this.encryptService) as T;
 
         await verificationData.AddRetries(reties)
         
@@ -115,6 +166,15 @@ export class VerificationService {
         return codeOrToken;
     }
 
+    /**
+     * Validates if a verification key exists and is still valid
+     * @param email - The email address to check
+     * @param verifyType - The type of verification from VerificationCacheKeys
+     * @param type - The class type for verification data
+     * @returns Promise<T> - The verification data if valid
+     * @throws GoneException if code is expired or not found
+     * @throws UnauthorizedException if userId is missing
+     */
     private async IsValidKey<T extends VerificationData>(
         email: string, 
         verifyType: VerificationCacheKeys,
