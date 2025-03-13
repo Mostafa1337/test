@@ -1,0 +1,79 @@
+@startuml
+title User Signup Process
+
+skinparam ParticipantBackgroundColor #EEEEEE
+skinparam ParticipantBorderColor #333333
+
+actor User
+participant "User Service" as UserService  #FFA500
+participant "Verification Service" as VerificationService  #DDA0DD
+participant "Cache Service" as CacheService  #FF6347
+participant "Notification Service" as NotificationService  #DDA0DD
+
+User -> UserService: Enter signup data
+activate User #lightblue
+activate UserService #FFA500
+
+UserService -> UserService: Check uniqueness of email and studentId
+alt unique
+  UserService -> VerificationService: Send email and user id
+  activate VerificationService #DDA0DD
+  
+  VerificationService -> CacheService: Get the token cached
+  activate CacheService #FF6347
+  CacheService --> VerificationService: "Get the cached email"
+  
+  alt cache exist
+    alt cooldown passed
+      alt retries < 5
+        VerificationService -> CacheService: "Set retry+1, new token"
+        VerificationService --> UserService: Send token
+        UserService -> NotificationService: Send verification email
+        UserService --> User: Signup successful
+      else retries >=5
+        VerificationService -> CacheService: "Set 1-hour cooldown"
+        VerificationService --> UserService: Send token
+        UserService -> NotificationService: Send verification email
+        UserService --> User: Signup successful
+      end
+    else cooldown active
+      VerificationService --> User: Error with remaining time
+    end
+  else cache missing
+    VerificationService -> CacheService: Save email, token, retries
+    VerificationService --> UserService: Send token
+    UserService -> NotificationService: Send verification email
+    UserService --> User: Signup successful
+  end
+  deactivate CacheService
+  deactivate VerificationService
+  
+else not unique
+  UserService --> User: Error - Duplicate credentials
+end
+
+deactivate UserService
+deactivate User
+
+' Verification Process
+User -> UserService: Verify email
+activate User #lightblue
+activate UserService #FFA500
+
+UserService -> VerificationService: Verify token
+activate VerificationService #DDA0DD
+VerificationService -> CacheService: Check cache
+activate CacheService #FF6347
+
+CacheService --> VerificationService: Cached data
+deactivate CacheService
+alt token valid
+  VerificationService --> User: Verification successful
+else invalid
+  VerificationService --> User: Verification failed
+end
+
+deactivate VerificationService
+deactivate UserService
+deactivate User
+@enduml

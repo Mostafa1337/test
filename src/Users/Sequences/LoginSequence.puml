@@ -1,0 +1,37 @@
+@startuml
+title User Login Process
+
+skinparam ParticipantBackgroundColor #EEEEEE
+skinparam ParticipantBorderColor #333333
+skinparam sequenceAltBackgroundColor #FFFFFF
+
+actor User #lightblue
+participant "User Service" as UserService #FFA500
+participant "Auth Service" as AuthService  #90EE90
+participant "Verification Service" as VerificationService  #DDA0DD
+
+User -> UserService: Enter credentials
+activate User #lightblue
+activate UserService #FFA500
+
+UserService -> UserService: Check Credentials 
+alt Credentials Valid
+  alt is verified
+    UserService -> AuthService: User Data
+    activate AuthService #90EE90
+    AuthService --> UserService: Token Data
+    deactivate AuthService
+    UserService --> User: Token + User Data
+  else not verified
+    UserService -> VerificationService: Send email/user id
+    activate VerificationService #DDA0DD
+    VerificationService -> VerificationService: Verify Sequence\n(Reference signup process)
+    deactivate VerificationService
+  end
+else Invalid Credentials
+  UserService --> User: Error - Invalid credentials
+end
+
+deactivate UserService
+deactivate User
+@enduml
