@@ -3,11 +3,14 @@ import { EntityBase } from "../../../Common/EntityBase";
 import { DeleteResult, FindOptionsWhere, IsNull, QueryFailedError, Repository, UpdateResult } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException, Scope, UnprocessableEntityException } from "@nestjs/common";
+import { LoggerMainService } from "src/logger/Logger.service";
+import { Exception } from "bullmq";
 
 @Injectable({ scope: Scope.REQUEST })
 export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
     constructor(
-        protected readonly repo: Repository<T>
+        protected readonly repo: Repository<T>,
+        protected readonly logger:LoggerMainService
     ) { }
 
     async FindAll(): Promise<T[]> {
@@ -24,7 +27,12 @@ export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
         try {
             const data = await this.repo.findOneBy(options);
             return data
-        } catch (err) {
+        } catch (err:any) {
+            this.logger.Error({
+                Error:err,
+                FunctionName:"FindOne",
+                StackTrace:err
+            })
             this.ErrorFactory(err)
         }
     }
@@ -55,7 +63,12 @@ export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
             
             return await this.FindById(id);
         }
-        catch (err) {
+        catch (err:any) {
+            this.logger.Error({
+                Error:err,
+                FunctionName:"Insert",
+                StackTrace:err
+            })
             this.ErrorFactory(err)
         }
     }
@@ -69,7 +82,12 @@ export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
         try {
             const insertedData = await this.repo.insert(dataCreated as QueryDeepPartialEntity<T>);
         }
-        catch (err) {
+        catch (err:any) {
+            this.logger.Error({
+                Error:err,
+                FunctionName:"Insert",
+                StackTrace:err
+            })
             this.ErrorFactory(err)
         }
 
@@ -91,7 +109,12 @@ export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
                 throw new NotFoundException("Nothing to delete")
             }
         }
-        catch (err) {
+        catch (err:any) {
+            this.logger.Error({
+                Error:err,
+                FunctionName:"Delete",
+                StackTrace:err
+            })
             this.ErrorFactory(err)
         }
     }
@@ -105,7 +128,6 @@ export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
             if (err.driverError.sqlState === '23000') {
                 throw new ConflictException("Duplicate entry")
             }
-
             throw new UnprocessableEntityException("Check your data ant try again")
         }
         throw new InternalServerErrorException("Error has happened try again later")

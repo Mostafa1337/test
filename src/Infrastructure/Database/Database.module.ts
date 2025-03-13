@@ -5,6 +5,7 @@ import { LoggerModule } from "src/logger/logger.module";
 import {DatabaseProvider} from './Database.provider';
 import { EntityBase } from '../../Common/EntityBase';
 import { GenericRepo } from './Repos/GenericRepo';
+import { LoggerMainService } from 'src/logger/Logger.service';
 
 @Module({
   imports: [
@@ -27,8 +28,8 @@ export class DatabaseModule {
 
       const contractProvider: Provider = {
         provide: contractToken,
-        useFactory: (repository) => new GenericRepo<T>(repository),
-        inject: [repositoryToken],  
+        useFactory: (repository,loggerServie:LoggerMainService) => new GenericRepo<T>(repository,loggerServie),
+        inject: [repositoryToken,LoggerMainService],  
       };
 
       return contractProvider;

@@ -3,8 +3,8 @@ class LoggerError extends LoggerBasic {
 
     StackTrace: string
 
-    constructor(ModuleName: string, FunctionName: string,Error: string, StackTrace: string) {
-        super(ModuleName,FunctionName)
+    constructor(FunctionName: string,Error: string, StackTrace: string) {
+        super(FunctionName)
         this.Error = Error
         this.StackTrace = StackTrace
     }

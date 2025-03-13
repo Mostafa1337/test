@@ -1,10 +1,7 @@
 class LoggerBasic {
-    ModuleName: string
-
     FunctionName: string
 
-    constructor(ModuleName: string, FunctionName: string) {
-        this.ModuleName = ModuleName
+    constructor(FunctionName: string) {
         this.FunctionName = FunctionName
     }
 }
