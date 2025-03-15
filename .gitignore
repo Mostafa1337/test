@@ -4,6 +4,7 @@
 /build
 private.pem
 public.pem
+/files
 # Logs
 logs
 *.log
