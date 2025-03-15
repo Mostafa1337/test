@@ -30,5 +30,8 @@ export class Users extends EntityBase {
     IsSuperAdmin: boolean = false
 
     @AutoMap()
+    ProfilePhoto?: string
+
+    @AutoMap()
     VerifyDate?:Date = null
 }

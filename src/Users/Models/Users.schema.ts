@@ -75,6 +75,12 @@ export class UsersSchema extends Schema<Users> {
                     length: 255,
                     nullable: false,
                     name: "password"
+                },
+                ProfilePhoto:{
+                    type: "varchar",
+                    length: 255,
+                    nullable: true,
+                    name: "Profilephoto"
                 }
             }
         })
