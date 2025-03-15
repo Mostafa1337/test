@@ -12,14 +12,16 @@ import { EncryptionService } from "./Encryption.service";
 @Injectable({ scope: Scope.REQUEST })
 export class VerificationService {
     private readonly ResetPassException: HttpException = new UnauthorizedException(`Invalid Code`)
-    private readonly ttl: number = parseFloat(this.configService.getOrThrow<string>("CODETTLINMINUTES"))
+    private readonly ttl: number;
 
     constructor(
         private readonly configService: ConfigService,
         private readonly encryptService:EncryptionService,
         @Inject(ICacheService)
         private readonly cacheService: ICacheService
-    ) { }
+    ) { 
+        this.ttl = parseFloat(this.configService.getOrThrow<string>("CODETTLINMINUTES"))
+    }
 
     /**
      * Sends a verification code to the specified email
