@@ -35,7 +35,7 @@ export class UsersService extends GenericService<Users>
         super(userRepo)
     }
 
-    NotFoundException: string = "This User not found";
+    NotFoundException: string = "This user doesn't exist";
 
     /**
      * Creates a new user with hashed password

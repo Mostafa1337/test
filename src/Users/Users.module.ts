@@ -13,6 +13,7 @@ import { UsersProfileController } from './Controllers/Profile.controller';
     DatabaseModule.forFeature([Users]),AuthModule,NotificationModule
   ],
   controllers: [UsersController,UsersProfileController],
-  providers: [UsersService,UsersProfile,NotificationModule],
+  providers: [UsersService,UsersProfile],
+  exports:[UsersService]
 })
 export class UsersModule{}
