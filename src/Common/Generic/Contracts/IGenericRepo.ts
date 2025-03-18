@@ -1,21 +1,29 @@
 import { EntityBase } from "src/Common/EntityBase";
-import { FindOptionsWhere } from "typeorm";
+import { Pagination } from "src/Common/Pagination/Pagination";
+import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
+import { FindOptionsRelations, FindOptionsWhere, Repository } from "typeorm";
 
 export interface IGenericRepo<T extends EntityBase>{
 
-    FindAll():Promise<T[]>
+    Repo: Repository<T>
+    
+    FindAll(options?: FindOptionsWhere<T> | FindOptionsWhere<T>[],relations?:FindOptionsRelations<T>):Promise<T[]>
 
-    FindAllPaginated()
+    FindAllPaginated(
+        options?: FindOptionsWhere<T> | FindOptionsWhere<T>[],
+        relations?:FindOptionsRelations<T>,
+        pagination?:Pagination,
+    ) :  Promise<PaginationResponce<T>>
 
-    FindOne(options: FindOptionsWhere<T> | FindOptionsWhere<T>[]):Promise<T>
+    FindOne(options: FindOptionsWhere<T> | FindOptionsWhere<T>[],relations?:FindOptionsRelations<T>):Promise<T>
 
-    FindById(id:string):Promise<T>
+    FindById(id:string,relations?:FindOptionsRelations<T>):Promise<T>
 
-    Update(id:string,updatedData:Partial<T>):Promise<T>
+    Update(id:string,updatedData:Partial<T>,relations?:FindOptionsRelations<T>):Promise<T>
 
     UpdateRecursive()
 
-    Insert(dataToInsert:T):Promise<T>
+    Insert(dataToInsert:T,relations?:FindOptionsRelations<T>):Promise<T>
 
     InsertRecursive()
 
