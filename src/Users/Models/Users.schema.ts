@@ -1,6 +1,8 @@
 import { Schema } from "src/Infrastructure/Database/Contracts/Schema";
 import { Users } from "./Users.entity";
 import { Usertypes } from "./Usertype";
+import { Communities } from "src/Communities/Models/Communities.entity";
+import { GetKey } from "src/Common/GetKeyFrom";
 
 
 // The maximum first name length was 46. I go with 50. (Of course, only 500 of those were over 25, and they were all cases where data imports resulted in extra junk winding up in that field.)
@@ -82,7 +84,15 @@ export class UsersSchema extends Schema<Users> {
                     nullable: true,
                     name: "Profilephoto"
                 }
-            }
+            },
+            relations: {
+                Communities: {
+                    type: "one-to-many",
+                    target: Communities.name,
+                    inverseSide: GetKey<Communities>("Leader"),
+                    onDelete: "RESTRICT",
+                },
+            },
         })
     }
 }

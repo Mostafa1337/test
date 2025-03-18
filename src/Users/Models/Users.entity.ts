@@ -2,6 +2,7 @@ import { EntityBase } from "src/Common/EntityBase";
 import { Usertypes } from "./Usertype";
 import { AutoMap } from "@automapper/classes";
 import { AfterLoad } from "typeorm";
+import { Communities } from "src/Communities/Models/Communities.entity";
 
 export class Users extends EntityBase {
 
@@ -34,4 +35,7 @@ export class Users extends EntityBase {
 
     @AutoMap()
     VerifyDate?:Date = null
+
+    @AutoMap()
+    Communities?:Communities[] 
 }
