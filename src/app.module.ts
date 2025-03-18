@@ -9,6 +9,7 @@ import { classes } from '@automapper/classes';
 import { NotificationModule } from './Infrastructure/Notification/NotificationModule';
 import { EventsModule } from './Infrastructure/Events/Events.module';
 import { FileModule } from './Common/FileUpload/File.Module';
+import { CommunitiesModule } from './Communities/Communities.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { FileModule } from './Common/FileUpload/File.Module';
     UsersModule,
     NotificationModule,
     EventsModule,
+    CommunitiesModule
   ],
   controllers: [],
   providers: [],
