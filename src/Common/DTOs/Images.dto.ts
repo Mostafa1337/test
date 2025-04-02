@@ -1,15 +1,11 @@
 import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class CommunityCardDto
+export class ImagesDto 
 {
     @AutoMap()
     @ApiProperty()
     Id:string
-    
-    @AutoMap()
-    @ApiProperty()
-    Logo:string
 
     @AutoMap()
     @ApiProperty()
@@ -17,8 +13,5 @@ export class CommunityCardDto
 
     @AutoMap()
     @ApiProperty()
-    DescShort:string
-
-    @ApiProperty()
-    MembersCount:number = 0
+    Link:string
 }

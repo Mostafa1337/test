@@ -4,6 +4,7 @@ import { Users } from "src/Users/Models/Users.entity";
 import { GetKey } from "src/Common/GetKeyFrom";
 import { CommunitiesMedia } from "../CommunitiesMedia.entity";
 import { CommunitiesImages } from "../CommunitiesImages.entity";
+import { Teams } from "src/Teams/Models/Teams.entity";
 
 export class CommunitiesSchema extends Schema<Communities> {
     constructor() {
@@ -63,6 +64,12 @@ export class CommunitiesSchema extends Schema<Communities> {
                     target: CommunitiesImages.name,
                     inverseSide:GetKey<CommunitiesImages>("Community"),
                     onDelete: "RESTRICT",
+                },
+                Teams:{
+                    type: "one-to-many",
+                    target: Teams.name,
+                    inverseSide:GetKey<Teams>("Community"),
+                    onDelete: "RESTRICT", 
                 }
             },
         })

@@ -2,7 +2,7 @@ import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsOptional, IsString, IsUrl, Max, MaxLength } from "class-validator";
 
-export class CommunityImageCreateDto 
+export class ImageCreateDto 
 {
     @IsString()
     @MaxLength(255)

@@ -1,8 +1,8 @@
 import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsUrl, Max, MaxLength } from "class-validator";
+import { IsNotEmpty, IsString, IsUrl, MaxLength } from "class-validator";
 
-export class CommunityMediaCreateDto 
+export class MediaCreateDto 
 {
     @IsString()
     @MaxLength(255)

@@ -9,16 +9,16 @@ import { ResponseType } from "src/Common/ResponseType";
 import { CommunitySearchDto } from "../Dtos/CommunitySearch.dto";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
 import { FilesInterceptor } from "@nestjs/platform-express";
-import { CommunityImageCreateDto } from "../Dtos/CommunityImageCreate.dto";
-import { CommunitiesImagesDto } from "../Dtos/CommunitiesImages.dto";
 import { CommunityDto } from "../Dtos/Community.dto";
 import { CommunityUpdateDto } from "../Dtos/CommunityUpdate.dto";
 import { CurrentUserDecorator } from "src/AuthModule/CurrentUser.decorator";
 import { TokenPayLoad } from "src/AuthModule/Dtos/TokenPayload";
 import { ICommunitiesService } from "../Services/ICommunities.service";
-import { ProfilePhotoFileOptions } from "src/Common/FileUpload/FileTypes/ProfilePhoto.file";
 import { CommunityLogoFileOptions } from "src/Common/FileUpload/FileTypes/CommunityLogo.file";
 import { CommunityImagesFileOptions } from "src/Common/FileUpload/FileTypes/CommunityImages.file";
+import { ImagesDto } from "src/Common/DTOs/Images.dto";
+import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
+import { LogoDto } from "src/Common/DTOs/Logo.dto";
 
 @ApiTags('Communities')
 @Controller("communities")
@@ -127,12 +127,12 @@ export class CommunitiesController {
         @Param("id") id: string,
         @UploadedFiles() files: Express.Multer.File[],
         @CurrentUserDecorator() payload: TokenPayLoad
-    ): Promise<ResponseType<CommunityDto>> {
+    ): Promise<ResponseType<LogoDto>> {
         if (!files || files?.length === 0) {
             throw new BadRequestException("Upload valid file")
         }
-        const community = await this.service.AddLogo(id, files[0], payload.UserId);
-        return new ResponseType<CommunityDto>(200, "Add community logo successfully", community)
+        const logo = await this.service.AddLogo(id, files[0], payload.UserId);
+        return new ResponseType<LogoDto>(200, "Add community logo successfully", logo)
     }
 
     /**
@@ -159,7 +159,7 @@ export class CommunitiesController {
             },
         },
     })
-    @ApiResponse({ status: 200, description: 'Images uploaded successfully', type: [CommunitiesImagesDto] })
+    @ApiResponse({ status: 200, description: 'Images uploaded successfully', type: [ImagesDto] })
     @ApiResponse({ status: 400, description: 'Invalid files or maximum limit exceeded' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Not Found Community - Not community leader' })
@@ -167,12 +167,12 @@ export class CommunitiesController {
         @Param("id") id: string,
         @UploadedFiles() files: Express.Multer.File[],
         @CurrentUserDecorator() payload: TokenPayLoad
-    ): Promise<ResponseType<CommunitiesImagesDto[]>> {
+    ): Promise<ResponseType<ImagesDto[]>> {
         if (!files || files?.length === 0) {
             throw new BadRequestException("Upload valid file")
         }
-        const imagesAdded = await this.service.AddImage(id, files, new CommunityImageCreateDto(), payload.UserId);
-        return new ResponseType<CommunitiesImagesDto[]>(200, "Add community images successfully", imagesAdded)
+        const imagesAdded = await this.service.AddImage(id, files, new ImageCreateDto(), payload.UserId);
+        return new ResponseType<ImagesDto[]>(200, "Add community images successfully", imagesAdded)
     }
 
     /**
@@ -198,7 +198,6 @@ export class CommunitiesController {
     }
 
     @Get('logo/:imagename')
-    @UseGuards(JWTGaurd)
     @Header('Content-Type', 'application/octet-stream')
     @ApiOkResponse({
         description: 'Returns a file as an octet-stream',
@@ -211,7 +210,6 @@ export class CommunitiesController {
             },
         },
     })
-    @ApiBearerAuth()
     @ApiNotFoundResponse()
     async handleGetLogo(
         @Param("imagename") imagename: string
@@ -220,7 +218,6 @@ export class CommunitiesController {
     }
 
     @Get('images/:imagename')
-    @UseGuards(JWTGaurd)
     @Header('Content-Type', 'application/octet-stream')
     @ApiOkResponse({
         description: 'Returns a file as an octet-stream',
@@ -233,7 +230,6 @@ export class CommunitiesController {
             },
         },
     })
-    @ApiBearerAuth()
     @ApiNotFoundResponse()
     async handleGetImages(
         @Param("imagename") imagename: string

@@ -4,6 +4,7 @@ import { Users } from "src/Users/Models/Users.entity";
 import { CommunitiesImages } from "./CommunitiesImages.entity";
 import { CommunitiesMedia } from "./CommunitiesMedia.entity";
 import { CommunitiesConstants } from "../CommunitiesConstants";
+import { Teams } from "src/Teams/Models/Teams.entity";
 
 export class Communities extends EntityBase {
 
@@ -33,4 +34,7 @@ export class Communities extends EntityBase {
 
     @AutoMap(() => [CommunitiesMedia])
     MediaLinks?: CommunitiesMedia[]
+
+    @AutoMap(() => [Teams])
+    Teams?: Teams[]
 }

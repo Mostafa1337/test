@@ -10,6 +10,7 @@ import { NotificationModule } from './Infrastructure/Notification/NotificationMo
 import { EventsModule } from './Infrastructure/Events/Events.module';
 import { FileModule } from './Common/FileUpload/File.Module';
 import { CommunitiesModule } from './Communities/Communities.module';
+import { TeamsModule } from './Teams/Teams.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { CommunitiesModule } from './Communities/Communities.module';
     UsersModule,
     NotificationModule,
     EventsModule,
-    CommunitiesModule
+    CommunitiesModule,
+    TeamsModule
   ],
   controllers: [],
   providers: [],

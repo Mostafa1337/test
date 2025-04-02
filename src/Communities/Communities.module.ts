@@ -17,5 +17,6 @@ import { ICommunitiesServiceProvider } from "./Services/ICommunities.service";
     ],
     controllers:[CommunitiesController],
     providers:[ICommunitiesServiceProvider,CommunitiesProfile],
+    exports: [ICommunitiesServiceProvider]
 })
 export class CommunitiesModule{}

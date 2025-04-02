@@ -12,15 +12,16 @@ import { CommunitiesMedia } from "../Models/CommunitiesMedia.entity";
 import { Like, Raw } from "typeorm";
 import { CommunitySearchDto } from "../Dtos/CommunitySearch.dto";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
-import { CommunityImageCreateDto } from "../Dtos/CommunityImageCreate.dto";
 import { IFileService } from "src/Common/FileUpload/IFile.service";
 import { CommunityLogoFileOptions } from "src/Common/FileUpload/FileTypes/CommunityLogo.file";
 import { CommunitiesConstants } from "../CommunitiesConstants";
 import { CommunityImagesFileOptions } from "src/Common/FileUpload/FileTypes/CommunityImages.file";
-import { CommunitiesImagesDto } from "../Dtos/CommunitiesImages.dto";
 import { CommunityDto } from "../Dtos/Community.dto";
 import { CommunityUpdateDto } from "../Dtos/CommunityUpdate.dto";
 import { ICommunitiesService } from "./ICommunities.service";
+import { ImagesDto } from "src/Common/DTOs/Images.dto";
+import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
+import { LogoDto } from "src/Common/DTOs/Logo.dto";
 
 //TODO update the auth part to better approach
 /**
@@ -83,7 +84,8 @@ export class CommunitiesService implements ICommunitiesService {
     async GetCommunity(id: string): Promise<CommunityDto> {
         const community = await this.repo.FindById(id,{
             MediaLinks: true,
-            Images: true
+            Images: true,
+            Teams:true
         })
 
         if (!community)
@@ -91,7 +93,7 @@ export class CommunitiesService implements ICommunitiesService {
         return await this.mapper.mapAsync(community,Communities,CommunityDto)
     }
 
-    private async GetCommunityWithLeaderCheck(id: string,leaderId:string): Promise<CommunityDto> {
+    async VerifyLeaderId(id: string,leaderId:string): Promise<CommunityDto> {
         const community = await this.repo.FindOne({
             Id:id,
             LeaderId:leaderId
@@ -106,7 +108,7 @@ export class CommunitiesService implements ICommunitiesService {
     }
 
     async UpdateCommunities(id: string,dto:CommunityUpdateDto,leaderId:string):Promise<void> {
-        const community = await this.GetCommunityWithLeaderCheck(id,leaderId);
+        const community = await this.VerifyLeaderId(id,leaderId);
 
         //TODO add Trnsaction here
         try{
@@ -120,8 +122,8 @@ export class CommunitiesService implements ICommunitiesService {
         }
     }
 
-    async AddLogo(id: string, files: Express.Multer.File,leaderId:string) {
-        const community = await this.GetCommunityWithLeaderCheck(id,leaderId);
+    async AddLogo(id: string, files: Express.Multer.File,leaderId:string) : Promise<LogoDto>{
+        const community = await this.VerifyLeaderId(id,leaderId);
         
         const fileUpload = await this.fileService.Update(
             files, CommunityLogoFileOptions,
@@ -132,12 +134,12 @@ export class CommunitiesService implements ICommunitiesService {
         community.Logo = `/communities/logo/${fileUpload.FileName}`
         await this.repo.Repo.update(id,{Logo:community.Logo});
 
-        return community
+        return new LogoDto(`${community.Name} Logo`,community.Logo )
     }
 
-    async AddImage(id: string, files: Express.Multer.File[], dto: CommunityImageCreateDto,leaderId:string):Promise<CommunitiesImagesDto[]> 
+    async AddImage(id: string, files: Express.Multer.File[], dto: ImageCreateDto,leaderId:string):Promise<ImagesDto[]> 
     {
-        const community = await this.GetCommunityWithLeaderCheck(id,leaderId);
+        const community = await this.VerifyLeaderId(id,leaderId);
 
         const communityImagesCount:number = await this.imagesRepo.Repo.countBy({CommunityId:id});
         if(communityImagesCount >= 10 || communityImagesCount + files.length > 10)
@@ -155,13 +157,13 @@ export class CommunitiesService implements ICommunitiesService {
                 communityImage.CommunityId = community.Id
         
                 const imageDb: CommunitiesImages = await this.imagesRepo.Insert(communityImage);
-                return await this.mapper.mapAsync(imageDb, CommunitiesImages, CommunitiesImagesDto)
+                return await this.mapper.mapAsync(imageDb, CommunitiesImages, ImagesDto)
             })
         )
     }
 
     async DeleteImage(id:string,imageId: string,leaderId:string):Promise<void> {
-        const community = await this.GetCommunityWithLeaderCheck(id,leaderId);
+        const community = await this.VerifyLeaderId(id,leaderId);
 
         const image = await this.imagesRepo.FindOne({
             CommunityId:id,
@@ -172,7 +174,9 @@ export class CommunitiesService implements ICommunitiesService {
         {
             throw new NotFoundException("Image not found")
         }
-        await this.fileService.Remove(image.File,CommunityImagesFileOptions,false)
+        
+        //TODO add Transaction
         await this.imagesRepo.Delete(image.Id);
+        await this.fileService.Remove(image.File,CommunityImagesFileOptions,false)
     }
 }

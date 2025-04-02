@@ -11,8 +11,9 @@ export class LogoDto
     @ApiProperty()
     File:string = "/communities/images/default"
 
-    constructor()
+    constructor(Name?:string,link?:string)
     {
-        this.Name = `${this.Name} Logo`
+        this.Name = Name ?? `${this.Name} Logo`
+        this.File = link ?? this.File
     }
 }

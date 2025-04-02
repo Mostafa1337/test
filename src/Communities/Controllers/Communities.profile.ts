@@ -2,15 +2,14 @@ import { createMap, forMember, mapFrom, MappingProfile } from '@automapper/core'
 import { AutomapperProfile, InjectMapper } from '@automapper/nestjs';
 import { Mapper } from '@automapper/core';
 import { Injectable, } from '@nestjs/common';
-import { LogoDto } from '../Dtos/Logo.dto';
+import { LogoDto } from '../../Common/DTOs/Logo.dto';
 import { Communities } from '../Models/Communities.entity';
 import { CommunityCardDto } from '../Dtos/CommunityCard.dto';
-import { CommunitiesImagesDto } from '../Dtos/CommunitiesImages.dto';
 import { CommunitiesImages } from '../Models/CommunitiesImages.entity';
 import { CommunityDto } from '../Dtos/Community.dto';
-import { CommunityMediaCreateDto } from '../Dtos/CommunityMediaCreatedto';
 import { CommunitiesMedia } from '../Models/CommunitiesMedia.entity';
-import { CommunityUpdateDto } from '../Dtos/CommunityUpdate.dto';
+import { ImagesDto } from 'src/Common/DTOs/Images.dto';
+import { MediaCreateDto } from 'src/Common/DTOs/MediaCreatedto';
 
 @Injectable()
 export class CommunitiesProfile extends AutomapperProfile {
@@ -26,14 +25,14 @@ export class CommunitiesProfile extends AutomapperProfile {
     return (mapper) => {
       createMap(mapper,Communities,LogoDto),
       createMap(mapper,Communities,CommunityCardDto),
-      createMap(mapper,CommunitiesImages,CommunitiesImagesDto, forMember(
-            (destination:CommunitiesImagesDto) => destination.Link,
+      createMap(mapper,CommunitiesImages,ImagesDto, forMember(
+            (destination:ImagesDto) => destination.Link,
             mapFrom((source : CommunitiesImages) => source.File)
         )
       ),
       createMap(mapper,Communities,CommunityDto),
-      createMap(mapper,CommunityMediaCreateDto,CommunitiesMedia),
-      createMap(mapper,CommunitiesMedia,CommunityMediaCreateDto)
+      createMap(mapper,MediaCreateDto,CommunitiesMedia),
+      createMap(mapper,CommunitiesMedia,MediaCreateDto)
 
     };
   }

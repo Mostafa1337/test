@@ -1,8 +1,9 @@
 import { AutoMap } from "@automapper/classes";
 import { CommunitiesConstants } from "../CommunitiesConstants";
-import { CommunitiesImagesDto } from "./CommunitiesImages.dto";
-import { CommunityMediaCreateDto } from "./CommunityMediaCreatedto";
 import { ApiProperty } from "@nestjs/swagger";
+import { ImagesDto } from "src/Common/DTOs/Images.dto";
+import { MediaCreateDto } from "src/Common/DTOs/MediaCreatedto";
+import { TeamCardDto } from "src/Teams/Dtos/TeamCard.dto";
 
 export class CommunityDto {
 
@@ -30,13 +31,17 @@ export class CommunityDto {
     @ApiProperty()
     Logo: string = CommunitiesConstants.DefaultLogo
 
-    @AutoMap(() => [CommunitiesImagesDto])
-    @ApiProperty({type:[CommunitiesImagesDto]})
-    Images?: CommunitiesImagesDto[]
+    @AutoMap(() => [ImagesDto])
+    @ApiProperty({type:[ImagesDto]})
+    Images?: ImagesDto[] = []
 
-    @AutoMap(() => [CommunityMediaCreateDto])
-    @ApiProperty({type:[CommunityMediaCreateDto]})
-    MediaLinks?: CommunityMediaCreateDto[]
+    @AutoMap(() => [MediaCreateDto])
+    @ApiProperty({type:[MediaCreateDto]})
+    MediaLinks?: MediaCreateDto[] = []
+
+    @AutoMap(() => [TeamCardDto])
+    @ApiProperty({type:[TeamCardDto]})
+    Teams: TeamCardDto[] = []
 
     @AutoMap()
     @ApiProperty()

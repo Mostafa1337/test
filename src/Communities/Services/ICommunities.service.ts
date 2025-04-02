@@ -1,14 +1,16 @@
 import { CommunityCardDto } from "../Dtos/CommunityCard.dto";
 import { CommunityCreateDto } from "../Dtos/CommunityCreate.dto";
 import { CommunityDto } from "../Dtos/Community.dto";
-import { CommunityImageCreateDto } from "../Dtos/CommunityImageCreate.dto";
 import { CommunitySearchDto } from "../Dtos/CommunitySearch.dto";
 import { CommunityUpdateDto } from "../Dtos/CommunityUpdate.dto";
-import { CommunitiesImagesDto } from "../Dtos/CommunitiesImages.dto";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
 import { CommunitiesService } from "./Communities.service";
+import { ImagesDto } from "src/Common/DTOs/Images.dto";
+import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
+import { LogoDto } from "src/Common/DTOs/Logo.dto";
+import { IVerifyLeader } from "src/Common/Generic/Contracts/IVerifyLeader";
 
-export interface ICommunitiesService {
+export interface ICommunitiesService extends IVerifyLeader<CommunityDto>{
     /**
      * Creates a new community
      * @param dataToInsert - The data for creating a new community
@@ -28,8 +30,8 @@ export interface ICommunitiesService {
     /**
      * Retrieves detailed information about a specific community
      * @param id - The ID of the community to retrieve
-     * @returns Promise containing the community details
-     * @throws NotFoundException if community is not found or if user is not the community leader
+     * @returns {Promise<CommunityDto>} containing the community details
+     * @throws {NotFoundException} if community is not found
      */
     GetCommunity(id: string): Promise<CommunityDto>;
 
@@ -38,8 +40,8 @@ export interface ICommunitiesService {
      * @param id - The ID of the community to update
      * @param dto - The update data
      * @param leaderId - The ID of the leader performing the update
-     * @throws NotFoundException if community is not found or if user is not the community leader
-     * @throws InternalServerErrorException if update operation fails
+     * @throws {NotFoundException} if community is not found or if user is not the community leader
+     * @throws {InternalServerErrorException} if update operation fails
      */
     UpdateCommunities(id: string, dto: CommunityUpdateDto, leaderId: string): Promise<void>;
 
@@ -48,10 +50,10 @@ export interface ICommunitiesService {
      * @param id - The ID of the community
      * @param files - The logo file to upload
      * @param leaderId - The ID of the leader performing the update
-     * @returns Promise containing the updated community
+     * @returns {Promise<LogoDto>} containing the updated/Added Logo
      * @throws NotFoundException if community is not found or if user is not the community leader
      */
-    AddLogo(id: string, files: Express.Multer.File, leaderId: string): Promise<CommunityDto>;
+    AddLogo(id: string, files: Express.Multer.File, leaderId: string): Promise<LogoDto>;
 
     /**
      * Adds images to a community
@@ -63,7 +65,7 @@ export interface ICommunitiesService {
      * @throws BadRequestException if maximum image limit is exceeded
      * @throws NotFoundException if community is not found or if user is not the community leader
      */
-    AddImage(id: string, files: Express.Multer.File[], dto: CommunityImageCreateDto, leaderId: string): Promise<CommunitiesImagesDto[]>;
+    AddImage(id: string, files: Express.Multer.File[], dto: ImageCreateDto, leaderId: string): Promise<ImagesDto[]>;
 
     /**
      * Deletes a community image
