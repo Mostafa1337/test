@@ -4,7 +4,7 @@ import { ImagesDto } from "../../Common/DTOs/Images.dto";
 import { MediaCreateDto } from "../../Common/DTOs/MediaCreatedto";
 import { ApiProperty } from "@nestjs/swagger";
 import { TeamChannelDto } from "./TeamChannel";
-import { TeamAchievmentDto } from "./TeamAchievment";
+import { TeamAchievementDto } from "./TeamAchievement";
 import { TeamLeaderDto } from "./TeamLeader";
 
 export class TeamDto {
@@ -45,9 +45,9 @@ export class TeamDto {
     @ApiProperty({type:[TeamChannelDto]})
     Channels: TeamChannelDto[] = []
 
-    @AutoMap(() => [TeamAchievmentDto])
-    @ApiProperty({type:[TeamAchievmentDto]})
-    Achievements: TeamAchievmentDto[] = []
+    @AutoMap(() => [TeamAchievementDto])
+    @ApiProperty({type:[TeamAchievementDto]})
+    Achievements: TeamAchievementDto[] = []
 
     @AutoMap(() => [TeamLeaderDto])
     @ApiProperty({type:[TeamLeaderDto]})

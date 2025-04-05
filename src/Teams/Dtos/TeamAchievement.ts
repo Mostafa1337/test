@@ -2,7 +2,7 @@ import { AutoMap } from "@automapper/classes"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsNotEmpty, IsString, MaxLength } from "class-validator"
 
-export class TeamAchievmentCreateDto
+export class TeamAchievementCreateDto
 {
     @ApiProperty()
     @IsNotEmpty()
@@ -18,7 +18,7 @@ export class TeamAchievmentCreateDto
     
 }
 
-export class TeamAchievmentDto
+export class TeamAchievementDto
 {
     @AutoMap()
     @ApiProperty()

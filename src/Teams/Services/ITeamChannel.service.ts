@@ -25,7 +25,7 @@ export interface ITeamsChannelService {
 
     
     /**
-     * Return all Achievments by team id
+     * Return all Achievements by team id
      * @param {string} teamId - The ID of the team
      * @returns {Promise<TeamChannelDto[]>} all team channel
      * @throws {NotFoundException} if team is not found 

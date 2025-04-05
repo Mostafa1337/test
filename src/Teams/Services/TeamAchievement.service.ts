@@ -6,7 +6,7 @@ import { Injectable, Scope, Inject, NotFoundException, } from "@nestjs/common";
 import { ITeamsAchievementService } from "./ITeamAchievement.service";
 import { TeamAchievements } from "../Models/TeamAchievements.entity";
 import { ITeamsService } from "./ITeams.service";
-import { TeamAchievmentCreateDto, TeamAchievmentDto } from "../Dtos/TeamAchievment";
+import { TeamAchievementCreateDto, TeamAchievementDto } from "../Dtos/TeamAchievement";
 import { Teams } from "../Models/Teams.entity";
 import { TeamAchievementImagesFileOptions } from "src/Common/FileUpload/FileTypes/TeamAchievement.file";
 import { FileReturn } from "src/Common/FileUpload/FileReturn";
@@ -15,7 +15,7 @@ import { FileReturn } from "src/Common/FileUpload/FileReturn";
  * @implements {ITeamsAchievementService}
  */
 @Injectable({ scope: Scope.REQUEST })
-export class TeamAchievmentService implements ITeamsAchievementService{
+export class TeamAchievementService implements ITeamsAchievementService{
 
     constructor(
         @Inject("REPO_TEAMACHIEVEMENTS")
@@ -29,7 +29,7 @@ export class TeamAchievmentService implements ITeamsAchievementService{
     ) {
     }
 
-    async Add(teamId: string, imageFile: Express.Multer.File, data: TeamAchievmentCreateDto, leaderId: string): Promise<TeamAchievmentDto> {
+    async Add(teamId: string, imageFile: Express.Multer.File, data: TeamAchievementCreateDto, leaderId: string): Promise<TeamAchievementDto> {
         const team:Teams = await this.teamService.VerifyLeaderId(teamId,leaderId);
                 
         const fileUpload:FileReturn[] = await this.fileService.Upload([imageFile],TeamAchievementImagesFileOptions)
@@ -37,14 +37,14 @@ export class TeamAchievmentService implements ITeamsAchievementService{
 
         const addedAch = await this.achRepo.Insert(new TeamAchievements(data.Title,data.Desc,link,team.Id));
 
-        return await this.mapper.mapAsync(addedAch,TeamAchievements,TeamAchievmentDto)
+        return await this.mapper.mapAsync(addedAch,TeamAchievements,TeamAchievementDto)
     }
     
-    async Delete(teamId: string, achievmentId: string, leaderId: string): Promise<void> {
+    async Delete(teamId: string, achievementId: string, leaderId: string): Promise<void> {
         const team:Teams = await this.teamService.VerifyLeaderId(teamId,leaderId);
         const achievement = await this.achRepo.FindOne({
             TeamId: team.Id,
-            Id: achievmentId
+            Id: achievementId
         })
 
         if(achievement)
@@ -57,10 +57,10 @@ export class TeamAchievmentService implements ITeamsAchievementService{
         await this.fileService.Remove(achievement.ImageLink,TeamAchievementImagesFileOptions,false)
     }
 
-    async GetById(teamId: string,achievmentId: string): Promise<TeamAchievmentDto> {
+    async GetById(teamId: string,achievementId: string): Promise<TeamAchievementDto> {
         const achievement = await this.achRepo.FindOne({
             TeamId: teamId,
-            Id: achievmentId
+            Id: achievementId
         })
 
         if(achievement)
@@ -68,14 +68,14 @@ export class TeamAchievmentService implements ITeamsAchievementService{
             throw new NotFoundException()
         }
 
-        return await this.mapper.mapAsync(achievement,TeamAchievements,TeamAchievmentDto)
+        return await this.mapper.mapAsync(achievement,TeamAchievements,TeamAchievementDto)
     }
 
-    async GetByTeam(teamId: string): Promise<TeamAchievmentDto[]> {
+    async GetByTeam(teamId: string): Promise<TeamAchievementDto[]> {
         const achievement = await this.achRepo.FindAll({
             TeamId: teamId,
         })
 
-        return await this.mapper.mapArrayAsync(achievement,TeamAchievements,TeamAchievmentDto)
+        return await this.mapper.mapArrayAsync(achievement,TeamAchievements,TeamAchievementDto)
     }
 }

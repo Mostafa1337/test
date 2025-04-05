@@ -12,7 +12,7 @@ import { MediaCreateDto } from 'src/Common/DTOs/MediaCreatedto';
 import { TeamLeaders } from '../Models/TeamLeaders.entity';
 import { TeamLeaderDto } from '../Dtos/TeamLeader';
 import { TeamAchievements } from '../Models/TeamAchievements.entity';
-import { TeamAchievmentDto } from '../Dtos/TeamAchievment';
+import { TeamAchievementDto } from '../Dtos/TeamAchievement';
 
 @Injectable()
 export class TeamsProfile extends AutomapperProfile {
@@ -44,7 +44,7 @@ export class TeamsProfile extends AutomapperProfile {
         ),
         createMap(mapper, Teams, TeamDto),
         createMap(mapper, TeamsMedia, MediaCreateDto),
-        createMap(mapper, TeamAchievements, TeamAchievmentDto)
+        createMap(mapper, TeamAchievements, TeamAchievementDto)
     };
   }
 
