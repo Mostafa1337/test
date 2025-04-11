@@ -23,6 +23,7 @@ import { TeamLeaders } from "../Models/TeamLeaders.entity";
 import { Users } from "src/Users/Models/Users.entity";
 import { IsNull, Raw } from "typeorm";
 
+//TODO verify the the team leader is not the Community leader
 /**
  * @implements {ITeamsService}
  */
