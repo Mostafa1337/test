@@ -52,12 +52,15 @@ export class UsersService extends GenericService<Users>
             throw new BadValidationException(new ClassValidatorExceptionDto<Users>("Email already exists","Email"),HttpStatus.CONFLICT)
         }
 
-        const existingStudentId:Users = await this.FindOne({
-            StudentId: dataToInsert.StudentId
-        }, false);
-    
-        if (existingStudentId) {
-            throw new BadValidationException(new ClassValidatorExceptionDto<Users>("Student Id already exists","StudentId"),HttpStatus.CONFLICT)
+        if(dataToInsert.StudentId)
+        {
+            const existingStudentId:Users = await this.FindOne({
+                StudentId: dataToInsert.StudentId
+            }, false);
+        
+            if (existingStudentId) {
+                throw new BadValidationException(new ClassValidatorExceptionDto<Users>("Student Id already exists","StudentId"),HttpStatus.CONFLICT)
+            }
         }
 
         dataToInsert.Password = await bcrypt.hash(dataToInsert.Password,await bcrypt.genSalt());
