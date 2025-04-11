@@ -1,0 +1,32 @@
+{
+
+    "version": "0.2.0",
+    "configurations": [
+     {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+              "run",
+              "set NODE_ENV=development",
+              "start:debug",
+              "--",
+              "--inspect-brk"
+            ],
+            "autoAttachChildProcesses": true,
+            "restart": true,
+            "sourceMaps": false,
+            "stopOnEntry": false,
+            "console": "integratedTerminal",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\src\\main.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
+        }
+    ]
+}
