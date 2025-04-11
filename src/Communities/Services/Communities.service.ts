@@ -63,7 +63,7 @@ export class CommunitiesService implements ICommunitiesService {
         }
 
         if (user.IsSuperAdmin) {
-            throw new BadRequestException("Super admins can't be leaders for communitites ")
+            throw new BadRequestException("Super admins can't be leaders for communities ")
         }
         const community = new Communities();
         community.Name = dataToInsert.Name.trim()
@@ -120,6 +120,40 @@ export class CommunitiesService implements ICommunitiesService {
         }catch(err){
             throw new InternalServerErrorException(`Error happened when trying to update ${community.Name}`)
         }
+    }
+
+    async UpdateCommunityNameAndLeaderEmail(id: string, dto: CommunityCreateDto): Promise<void> {
+        const currentCommunity = await this.repo.FindById(id);
+        if(!currentCommunity)
+            throw new NotFoundException("Community not found")
+
+        const user: Users = await this.userService.FindByEmail(dto.LeaderEmail)
+        const communities: Communities[] = await this.repo.FindAll(
+            [
+                { Name: Raw(alias => `LOWER(${alias}) = LOWER(:name)`, { name: dto.Name.toLowerCase() }) },
+                { LeaderId: user.Id }
+            ],
+            {
+                Teams:true
+            }
+        );
+        if (user.IsSuperAdmin) {
+            throw new BadRequestException("Super admins can't be leaders for communities ")
+        }
+
+        for (const community of communities) {
+            if (community.Name.toLowerCase() === dto.Name.toLowerCase() &&  community.Name.toLowerCase() !== currentCommunity.Name.toLowerCase()) {
+                throw new ConflictException("There is a community with this name")
+            } else if (community.LeaderId === user.Id && user.Id !== currentCommunity.LeaderId) {
+                throw new ConflictException("Leaders can only lead one community at maximum ")
+            }else if(community.Teams?.filter(x=> x.LeaderId === user.Id).length > 0){
+                throw new ConflictException(`Team leaders for community ${community.Name} can't be Community ${community.Name} admin`)
+            }
+        }
+        currentCommunity.LeaderId = user.Id
+        currentCommunity.Name = dto.Name
+
+        await this.repo.Update(currentCommunity.Id,currentCommunity);   
     }
 
     async AddLogo(id: string, files: Express.Multer.File,leaderId:string) : Promise<LogoDto>{

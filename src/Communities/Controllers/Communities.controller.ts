@@ -95,9 +95,29 @@ export class CommunitiesController {
         @CurrentUserDecorator() payload: TokenPayLoad
     ): Promise<ResponseType<void>> {
         await this.service.UpdateCommunities(id, dto, payload.UserId);
-        return new ResponseType<void>(200, "Get community successfully")
+        return new ResponseType<void>(200, "Community updated successfully")
     }
 
+    /**
+     * Updates a community
+     */
+    @Patch(":id/core")
+    @UseGuards(JWTGaurd,SuperAdminGaurd)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Update community Name or leader' })
+    @ApiParam({ name: 'id', description: 'Community ID' })
+    @ApiResponse({ status: 200, description: 'Community updated successfully' })
+    @ApiResponse({ status: 401, description: 'Unauthorized' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Not Super admin' })
+    @ApiResponse({ status: 404, description: 'Not Found Community' })
+    async UpdateCommunityNameOrLeader(
+        @Param("id") id: string,
+        @Body() dto: CommunityCreateDto,
+    ): Promise<ResponseType<void>> {
+        await this.service.UpdateCommunityNameAndLeaderEmail(id, dto);
+        return new ResponseType<void>(200, "Community updated successfully")
+    }
+    
     /**
      * Uploads community logo
      */

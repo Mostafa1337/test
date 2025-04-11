@@ -46,6 +46,14 @@ export interface ICommunitiesService extends IVerifyLeader<CommunityDto>{
     UpdateCommunities(id: string, dto: CommunityUpdateDto, leaderId: string): Promise<void>;
 
     /**
+     * Updates community Core information Name or leader Email
+     * @param {string} id - The ID of the community to update
+     * @param {CommunityCreateDto} dto - The update data
+     * @throws {NotFoundException} if community is not found or if user is not the community leader
+     */
+    UpdateCommunityNameAndLeaderEmail(id: string, dto: CommunityCreateDto): Promise<void>;
+
+    /**
      * Adds or updates the community logo
      * @param id - The ID of the community
      * @param files - The logo file to upload
