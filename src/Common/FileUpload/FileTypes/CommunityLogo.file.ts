@@ -6,7 +6,7 @@ class CommunityLogoFile implements IFile
 {
     MaxSize: number = 1024 * 1024 * 5;
 
-    Dest: string = "\\communities\\logo\\";
+    Dest: string = "/communities/logo/";
 
     FileType: IFileTypes = new ImageFileType();
 }

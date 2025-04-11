@@ -6,7 +6,7 @@ class CommunityImagesFile implements IFile
 {
     MaxSize: number = 1024 * 1024 * 5;
 
-    Dest: string = "\\communities\\images\\";
+    Dest: string = "/communities/images/";
 
     FileType: IFileTypes = new ImageFileType();
 }

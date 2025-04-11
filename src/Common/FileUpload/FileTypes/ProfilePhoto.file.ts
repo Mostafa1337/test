@@ -6,7 +6,7 @@ class ProfilePhotoFile implements IFile
 {
     MaxSize: number = 1024 * 1024 * 5;
 
-    Dest: string = "\\profile\\images\\";
+    Dest: string = "/profile/images/";
 
     FileType: IFileTypes = new ImageFileType();
 }

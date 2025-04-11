@@ -6,7 +6,7 @@ class TeamAchievementImagesFile implements IFile
 {
     MaxSize: number = 1024 * 1024 * 5;
 
-    Dest: string = "\\teams\\achievements\\";
+    Dest: string = "/teams/achievements/";
 
     FileType: IFileTypes = new ImageFileType();
 }

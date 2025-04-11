@@ -6,7 +6,7 @@ class TeamLogoFile implements IFile
 {
     MaxSize: number = 1024 * 1024 * 5;
 
-    Dest: string = "\\teams\\logo\\";
+    Dest: string = "/teams/logo/";
 
     FileType: IFileTypes = new ImageFileType();
 }

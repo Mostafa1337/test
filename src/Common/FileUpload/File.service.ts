@@ -26,7 +26,7 @@ export class FileService implements IFileService {
         if (!filePath)
             throw new FileNotFound("")
 
-        const fullFilePath = path.join("files" + filePath);
+        const fullFilePath = path.join("files" , filePath);
         this.IsFileLocationValid(fullFilePath, fileOptions, true)
 
         const file = createReadStream(fullFilePath);
@@ -63,7 +63,7 @@ export class FileService implements IFileService {
     }
 
     public async Remove(filepath: string, fileOptions: IFile, IgnoreUnFoundError?: boolean): Promise<void> {
-        const fullFilePath = path.join("files" + filepath);
+        const fullFilePath = path.join("files" , filepath);
         this.IsFileLocationValid(fullFilePath, fileOptions, true)
 
         try {
@@ -107,10 +107,10 @@ export class FileService implements IFileService {
             }
 
             const newFilename = `${Date.now()}_${randomBytes(5).toString("hex")}.${fileType.ext}`;
-            const filePath = path.join("files" + fileOptions.Dest, newFilename);
+            const filePath = path.join("files" , fileOptions.Dest, newFilename);
 
             //Check if the folder of the files exists if not create them
-            const mainFolder = path.join("files" + fileOptions.Dest);
+            const mainFolder = path.join("files" , fileOptions.Dest);
             try {
                 await access(mainFolder, constants.F_OK);
             } catch (err) {
@@ -169,7 +169,7 @@ export class FileService implements IFileService {
      * @throws FileNotFound - If file is already exist
      */
     private IsFileLocationValid(filePath: string, fileOptions: IFile, thorwError: boolean = true): boolean {
-        if (!filePath.startsWith(`files${fileOptions.Dest}`)) {
+        if (!filePath.startsWith(path.join(`files`,fileOptions.Dest))) {
             if (thorwError)
                 throw new FileNotFound("")
             return false
