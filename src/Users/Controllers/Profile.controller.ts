@@ -93,13 +93,20 @@ export class UsersProfileController {
             },
         },
     })
-    @ApiOkResponse({ type: "string", description: "The photo relative URL without api prefix" })
+    @ApiOkResponse({
+        schema: {
+            type: 'object',
+            properties: {
+                Image: { type: 'string' },
+            },
+        }, description: "The photo relative URL without api prefix"
+    })
     @ApiBadRequestResponse()
     @ApiConflictResponse()
     async handleUploadPhoto(
         @UploadedFiles() files: Express.Multer.File[],
         @CurrentUserDecorator() tokenPayLoad: TokenPayLoad
-    ): Promise<ResponseType<string>> {
+    ): Promise<ResponseType<{ Image: string }>> {
         if (!files || files?.length === 0) {
             throw new BadRequestException("Upload valid file")
         }
@@ -112,7 +119,7 @@ export class UsersProfileController {
         user.ProfilePhoto = `/users/profile/photo/${newPhotoPath.FileName}`
         await this.service.Update(user.Id, user)
 
-        return new ResponseType<string>(HttpStatus.CREATED, "Profile photo added successfully", user.ProfilePhoto)
+        return new ResponseType<{ Image: string }>(HttpStatus.CREATED, "Profile photo added successfully", { Image: user.ProfilePhoto })
     }
 
     @Delete('photo')

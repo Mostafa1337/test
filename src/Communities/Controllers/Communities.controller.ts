@@ -122,7 +122,6 @@ export class CommunitiesController {
      * Uploads community logo
      */
     @Post(":id/logo")
-    @UseGuards(JWTGaurd)
     @UseInterceptors(FilesInterceptor("file", 1))
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Upload community logo' })
@@ -139,7 +138,7 @@ export class CommunitiesController {
             },
         },
     })
-    @ApiResponse({ status: 200, description: 'Logo uploaded successfully', type: CommunityDto })
+    @ApiResponse({ status: 200, description: 'Logo uploaded successfully', type: LogoDto })
     @ApiResponse({ status: 400, description: 'Invalid file' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Not Found Community - Not community leader' })
@@ -159,7 +158,6 @@ export class CommunitiesController {
      * Uploads community images
      */
     @Post(":id/images")
-    @UseGuards(JWTGaurd)
     @UseInterceptors(FilesInterceptor("file", 10))
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Upload community images' })
