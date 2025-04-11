@@ -56,7 +56,7 @@ export class UserUpdateDto {
         nullable: false,
         required: true,
         example: "1203087667",
-        pattern: "/^1[0-9]{10}$/"
+        pattern: "/^1[0-9]{9}$/"
     })
     @AutoMap()
     PhoneNumber: string;
