@@ -157,7 +157,7 @@ export class VerificationService {
             verificationData = new VerificationData(userId)
         }
         const codeOrToken:T = await verificationData.GenerateData(this.encryptService) as T;
-
+        
         await verificationData.AddRetries(reties)
         
         await this.cacheService.SetHashSet(new CacheDto({
