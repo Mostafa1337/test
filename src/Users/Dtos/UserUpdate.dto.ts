@@ -48,7 +48,7 @@ export class UserUpdateDto {
     StudentId?: string = null;
 
     @IsString()
-    @Matches(/^1[0-9]{9}$/)
+    @Matches(/^01[0-2,5][0-9]{8}$/)
     @IsNotEmpty()
     @ApiProperty({
         name: "PhoneNumber",
@@ -56,7 +56,7 @@ export class UserUpdateDto {
         nullable: false,
         required: true,
         example: "1203087667",
-        pattern: "/^1[0-9]{9}$/"
+        pattern: "/^01[0-2,5][0-9]{8}$/"
     })
     @AutoMap()
     PhoneNumber: string;

@@ -145,7 +145,7 @@ export class UsersService extends GenericService<Users>
     async Verify(email:string,token:string,ipAddress:string) : Promise<TokenReturnDto>
     {
         const userId:string = await this.resetPassService.VerifyToken(email,token,VerificationCacheKeys.SIGNUP)
-        const user:Users =  await this.Update(userId,{VerifyDate:new Date()})
+        const user:Users =  await this.repo.Update(userId,{VerifyDate:new Date()})
         const tokenData = await this.authService.SignIn(user,ipAddress)
 
         return new TokenReturnDto(
