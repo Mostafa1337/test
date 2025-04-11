@@ -47,7 +47,7 @@ export class TeamAchievementService implements ITeamsAchievementService{
             Id: achievementId
         })
 
-        if(achievement)
+        if(!achievement)
         {
             throw new NotFoundException()
         }

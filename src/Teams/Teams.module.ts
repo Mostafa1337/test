@@ -14,13 +14,14 @@ import { CommunitiesModule } from "src/Communities/Communities.module";
 import { UsersModule } from "src/Users/Users.module";
 import { TeamsProfile } from "./Controllers/Team.profile";
 import { TeamImagesGet } from "./Controllers/TeamImagesGet.controller";
+import { TeamAchievementController } from "./Controllers/TeamAchievement.controller";
 
 @Module({
     imports:[
        DatabaseModule.forFeature([Teams,TeamsMedia,TeamImages,TeamLeaders,TeamAchievements,TeamChannels,TeamChannelChats]),
        CommunitiesModule,UsersModule
     ],
-    controllers:[TeamsController,TeamImagesGet],
+    controllers:[TeamsController,TeamAchievementController,TeamImagesGet],
     providers:[ITeamsServiceProvider,ITeamsAchievementServiceProvider,TeamsProfile],
 })
 export class TeamsModule{}

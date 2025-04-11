@@ -1,6 +1,6 @@
 import { AutoMap } from "@automapper/classes"
-import { ApiProperty } from "@nestjs/swagger"
-import { IsNotEmpty, IsString, MaxLength } from "class-validator"
+import { ApiHideProperty, ApiProperty } from "@nestjs/swagger"
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator"
 
 export class TeamAchievementCreateDto
 {
@@ -16,6 +16,13 @@ export class TeamAchievementCreateDto
     @MaxLength(325)
     public Desc:string
     
+    /**
+   * DON'T USE
+   * this Property only exist to pass class validator verification on it 
+   */
+    @ApiHideProperty()
+    @IsOptional()
+    public file?: any;
 }
 
 export class TeamAchievementDto
