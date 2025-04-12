@@ -1,0 +1,9 @@
+./dist
+./files
+./node_modules
+./env
+./env.example
+./application.log
+./README.md
+./private.pem
+./public.pem
