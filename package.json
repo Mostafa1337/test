@@ -23,6 +23,7 @@
     "typeorm": "npm run build && npx typeorm -d ./dist/Infrastructure/Database/Database.provider.js",
     "migration:generate": "npm run typeorm -- migration:generate ./src/Infrastructure/Database/Migrations/%name%",
     "migration:run": "npm run typeorm -- migration:run",
+    "migration:runprod": "npx typeorm -d ./dist/Infrastructure/Database/Database.provider.js -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert"
   },
   "dependencies": {

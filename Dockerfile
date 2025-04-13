@@ -1,25 +1,24 @@
-FROM node:22.8.0-alpine as Stage
+FROM node:22.8.0-alpine AS stage
 
 WORKDIR /app/temp
 
 COPY ./package*.json ./
-RUN npm install --omit=dev
-RUN npm install -g @nestjs/cli@10.4.7 --save
+RUN npm install 
+RUN npm install -g @nestjs/cli --save
 
 COPY . .
 
-RUN npm run build --omit=dev
+RUN npm run build
 
-FROM node:22.8.0-alpine as Build
+FROM node:22.8.0-alpine AS build
 
 WORKDIR /app
 
-COPY --from=Stage /app/backend/build/dist ./dist
-COPY --from=Stage /app/backend/build/node_modules ./node_modules
-COPY --from=Stage /app/backend/build/package*.json .
+COPY --from=stage /app/backend/build/dist ./dist
+#TODO add --omit=dev to exclude dev dependencies  
+COPY --from=stage /app/backend/build/node_modules ./node_modules
+COPY --from=stage /app/backend/build/package*.json .
 
 ENV NODE_ENV=production
 
-RUN npm run migration:run
-
-CMD ["sh", "-c", "npm run migrate:run && npm run start"]
+CMD ["sh", "-c", "npm run migrate:runprod && npm run start:prod"]
