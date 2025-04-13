@@ -15,10 +15,9 @@ FROM node:22.8.0-alpine AS build
 WORKDIR /app
 
 COPY --from=stage /app/temp/dist ./dist
-#TODO add --omit=dev to exclude dev dependencies  
-COPY --from=stage /app/temp/node_modules ./node_modules
 COPY --from=stage /app/temp/package*.json .
+RUN npm install --omit=dev
 
 ENV NODE_ENV=production
 
-CMD ["sh", "-c", "npm run migrate:runprod && npm run start:prod"]
+CMD ["sh", "-c", "npm run migration:runprod && npm run start:prod"]
