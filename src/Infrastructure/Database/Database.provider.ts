@@ -21,7 +21,8 @@ export class DatabaseProvider implements TypeOrmOptionsFactory{
             entities: ['dist/**/*.{schema.ts,schema.js,entity.ts,entity.js}'],
             synchronize: false, 
             migrationsTableName: 'migration',
-            migrations: ['dist/InfraStructure/Database/Migrations/*{.ts,.js}'],
+            migrations: [__dirname + '*/**/Migrations/*.js'],
+            migrationsRun:process.env.NODE_ENV === "production",
         }
     }
 }

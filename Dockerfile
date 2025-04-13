@@ -20,4 +20,4 @@ RUN npm install --omit=dev
 
 ENV NODE_ENV=production
 
-CMD ["sh", "-c", "npm run migration:runprod && npm run start:prod"]
+CMD ["sh", "-c", "npm run start:prod"]
