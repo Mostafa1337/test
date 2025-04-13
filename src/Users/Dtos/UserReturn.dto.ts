@@ -50,6 +50,9 @@ export class UserReturnDto extends EntityBase{
     @AutoMap()
     Usertype: string;
 
+    @ApiProperty()
+    @AutoMap()
+    IsSuperAdmin: string;
 
     @ApiProperty({
         name:"ProfilePhoto",
