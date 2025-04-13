@@ -8,6 +8,9 @@ import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
 import { NotificationModule } from './Infrastructure/Notification/NotificationModule';
 import { EventsModule } from './Infrastructure/Events/Events.module';
+import { FileModule } from './Common/FileUpload/File.Module';
+import { CommunitiesModule } from './Communities/Communities.module';
+import { TeamsModule } from './Teams/Teams.module';
 
 @Module({
   imports: [
@@ -15,13 +18,15 @@ import { EventsModule } from './Infrastructure/Events/Events.module';
     AutomapperModule.forRoot({
       strategyInitializer: classes(),
     }),
+    FileModule,
     LoggerModule,
     DatabaseModule,
     CacheModule,
     UsersModule,
     NotificationModule,
     EventsModule,
-    
+    CommunitiesModule,
+    TeamsModule
   ],
   controllers: [],
   providers: [],

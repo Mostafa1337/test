@@ -35,7 +35,7 @@ export class UsersService extends GenericService<Users>
         super(userRepo)
     }
 
-    NotFoundException: string = "This User not found";
+    NotFoundException: string = "This user doesn't exist";
 
     /**
      * Creates a new user with hashed password
@@ -52,12 +52,15 @@ export class UsersService extends GenericService<Users>
             throw new BadValidationException(new ClassValidatorExceptionDto<Users>("Email already exists","Email"),HttpStatus.CONFLICT)
         }
 
-        const existingStudentId:Users = await this.FindOne({
-            StudentId: dataToInsert.StudentId
-        }, false);
-    
-        if (existingStudentId) {
-            throw new BadValidationException(new ClassValidatorExceptionDto<Users>("Student Id already exists","StudentId"),HttpStatus.CONFLICT)
+        if(dataToInsert.StudentId)
+        {
+            const existingStudentId:Users = await this.FindOne({
+                StudentId: dataToInsert.StudentId
+            }, false);
+        
+            if (existingStudentId) {
+                throw new BadValidationException(new ClassValidatorExceptionDto<Users>("Student Id already exists","StudentId"),HttpStatus.CONFLICT)
+            }
         }
 
         dataToInsert.Password = await bcrypt.hash(dataToInsert.Password,await bcrypt.genSalt());
@@ -142,7 +145,7 @@ export class UsersService extends GenericService<Users>
     async Verify(email:string,token:string,ipAddress:string) : Promise<TokenReturnDto>
     {
         const userId:string = await this.resetPassService.VerifyToken(email,token,VerificationCacheKeys.SIGNUP)
-        const user:Users =  await this.Update(userId,{VerifyDate:new Date()})
+        const user:Users =  await this.repo.Update(userId,{VerifyDate:new Date()})
         const tokenData = await this.authService.SignIn(user,ipAddress)
 
         return new TokenReturnDto(

@@ -18,7 +18,7 @@ export class NotificationService implements INotification
             To:toEmail,
             Message:"Verify your identity",
             Context:{
-                Link:`${this.GetFrontendLink()}/users/verify?Email=${toEmail}&Token=${token}`
+                Link:`${this.GetFrontendLink()}/${this.configService.getOrThrow<string>("FRONTEND_VERIFY_RELATIVE_URL")}?Email=${toEmail}&Token=${token}`
             }
         });
     }

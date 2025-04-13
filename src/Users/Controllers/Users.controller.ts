@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Ip, Patch, Post, Put, Query, Res, UseGuards } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiGoneResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Inject, Ip, NotAcceptableException, NotFoundException, Param, Patch, Post, Put, Query, Res, StreamableFile, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiConsumes, ApiCreatedResponse, ApiGoneResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { Users } from "../Models/Users.entity";
 import { UsersService } from "../Services/Users.service";
 import { ResponseType } from "src/Common/ResponseType";
@@ -7,16 +7,8 @@ import { UserLoginDto } from "../Dtos/UserLogin.dto";
 import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
 import { TokenReturnDto } from "src/AuthModule/Dtos/TokenReturn.dto";
-import { UserReturnDto } from "../Dtos/UserReturn.dto";
-import { CurrentUserDecorator } from "src/AuthModule/CurrentUser.decorator";
-import { TokenPayLoad } from "src/AuthModule/Dtos/TokenPayload";
-import { JWTGaurd } from "src/AuthModule/Gaurds/JWT.gaurd";
-import { response, Response } from "express";
 import { ClassValidatorExceptionDto } from "src/Common/ClassValidatorException.dto";
-import { MapEnumHelper } from "src/Common/MapEnum.helper";
 import { UserCreateDto } from "../Dtos/UserCreate.dto";
-import { UserUpdateDto } from "../Dtos/UserUpdate.dto";
-import { UpdatePasswordDto } from "../Dtos/UpdatePassword.dto";
 import { ResetPassCodeDto, ResetPassCodeReturnDto, ResetPassDto, ResetPassTokenDto } from "../Dtos/ResetPassDtos";
 import { VerifyDto } from "../Dtos/Verify.dto";
 
@@ -65,56 +57,6 @@ export class UsersController{
     ):Promise<ResponseType<TokenReturnDto>>{
         const data:TokenReturnDto = await this.service.Verify(dto.Email,dto.Token,ipAddress);
         return new ResponseType<TokenReturnDto>(HttpStatus.OK,"logged in successfully",data)
-    }
-
-    @Get("profile")
-    @ApiBearerAuth()
-    @ApiOkResponse({ type:UserReturnDto })
-    @ApiNotFoundResponse()
-    @UseGuards(JWTGaurd)
-    async GetMyProfile(
-        @CurrentUserDecorator() tokenPayLoad:TokenPayLoad
-    ):Promise<ResponseType<UserReturnDto>>{
-        const user:Users = await this.service.FindById(tokenPayLoad.UserId,true);
-        const userReturn:UserReturnDto = await this.mapper.mapAsync(user,Users,UserReturnDto);
-
-        return new ResponseType<UserReturnDto>(HttpStatus.OK,"logged in successfully",userReturn) 
-    }
-
-    @Patch("profile")
-    @ApiBearerAuth()
-    @ApiBody({ type:UserUpdateDto })
-    @ApiOkResponse({ type:UserReturnDto })
-    @ApiNotFoundResponse()
-    @ApiConflictResponse()
-    @ApiBadRequestResponse({type: [ClassValidatorExceptionDto]})
-    @UseGuards(JWTGaurd)
-    async UpdateMyProfile(
-        @Body() dto:UserUpdateDto,
-        @CurrentUserDecorator() tokenPayLoad:TokenPayLoad
-    ):Promise<ResponseType<UserReturnDto>>{
-        const userUpdate:Users = await this.mapper.mapAsync(dto,UserUpdateDto,Users);
-
-        const user:Users = await this.service.Update(tokenPayLoad.UserId,userUpdate);
-        const userReturn:UserReturnDto = await this.mapper.mapAsync(user,Users,UserReturnDto);
-
-        return new ResponseType<UserReturnDto>(HttpStatus.OK,"Updated successfully",userReturn) 
-    }
-
-    @Patch("profile/password")
-    @ApiBearerAuth()
-    @ApiBody({ type:UpdatePasswordDto })
-    @ApiOkResponse()
-    @ApiNotFoundResponse()
-    @ApiBadRequestResponse({type: [ClassValidatorExceptionDto]})
-    @UseGuards(JWTGaurd)
-    async UpdateMyProfilePassword(
-        @Body() dto:UpdatePasswordDto,
-        @CurrentUserDecorator() tokenPayLoad:TokenPayLoad
-    ):Promise<ResponseType<void>>{
-        await this.service.UpdatePassword(tokenPayLoad.UserId,dto);
-
-        return new ResponseType<void>(HttpStatus.OK,"Password changed successfully") 
     }
 
     @Post("resetpass/sendcode")

@@ -11,14 +11,14 @@ export class TokenPayLoad{
 
     readonly UserId:string
 
-    readonly IsSuperAdmin:boolean
+    readonly IsSuperAdmin:boolean = false
 
     readonly ExpireDate:Date
 
     constructor(userId:string,firstName:string,email:string,IsSuperAdmin:boolean,time:number,durationType:string){
         // this.FirstName = firstName
         this.Email = email
-        this.IsSuperAdmin = this.IsSuperAdmin
+        this.IsSuperAdmin = IsSuperAdmin
         
         switch(durationType)
         {

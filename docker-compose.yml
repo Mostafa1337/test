@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    image: bridgex/backend:latest
+    ports:
+      - "8000:8000"
+    env_file: ./backend.env
+    volumes:
+      - ./private.pem:/app/private.pem
+      - ./public.pem:/app/public.pem
+      - backendFile:/app/files
+      - backendLogs:/app/application.log
+    networks:
+      - backend_net
+
+  backendCache:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - backend_net
+
+  backendDb:
+    image: mysql:8.0
+    env_file: ./db.env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - backend_net
+
+volumes:
+  mysql_data:
+
+  backendFile:
+
+  backendLogs:
+
+
+networks:
+  backend_net:
+    driver: bridge
