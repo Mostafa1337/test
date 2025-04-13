@@ -6,6 +6,7 @@ private.pem
 public.pem
 /files
 bridgex-server-key.pem
+kerolos_credentials (1).csv
 # Logs
 logs
 *.log
