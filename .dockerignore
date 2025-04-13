@@ -1,9 +1,10 @@
 ./dist
 ./files
 ./node_modules
-./env
-./env.example
-./application.log
-./README.md
-./private.pem
-./public.pem
+env
+env.example
+application.log
+README.md
+private.pem
+public.pem
+bridgex-server-key.pem
