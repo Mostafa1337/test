@@ -26,7 +26,8 @@ export class GlobalExceptionFilter implements ExceptionFilter
         }
         else
         {
-            res.status(500).json(new ResponseType<void>(HttpStatus.INTERNAL_SERVER_ERROR,'Error has happend try again later',null,'Internal Server error'))
+            console.log(exception)
+            res.status(500).json(new ResponseType<void>(HttpStatus.INTERNAL_SERVER_ERROR,'Error has happened try again later',null,'Internal Server error'))
         }
 
         res.end();

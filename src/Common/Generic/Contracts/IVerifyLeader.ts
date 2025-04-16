@@ -5,7 +5,7 @@ export interface IVerifyLeader<T>
      * @param {string} Id - The ID of the Entity
      * @param  {string} userId - The ID of the user 
      * @returns {Promise<T>} the data to be returned
-     * @throws {NotFoundException} if community is not found or if user is not the community leader
+     * @throws {NotFoundException} if T is not found or if user is not the T leader
      */
     VerifyLeaderId(Id: string,userId: string): Promise<T>;
 }

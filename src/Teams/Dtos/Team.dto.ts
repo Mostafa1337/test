@@ -6,6 +6,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { TeamChannelDto } from "./TeamChannel";
 import { TeamAchievementDto } from "./TeamAchievement";
 import { TeamLeaderDto } from "./TeamLeader";
+import { ICanModify } from "src/Common/Generic/Contracts/ICanModify";
 
 export class TeamDto {
 
@@ -56,4 +57,15 @@ export class TeamDto {
     @AutoMap()
     @ApiProperty()
     CreatedAt: Date
+}
+
+export class TeamWithCanModifyDto extends TeamDto implements ICanModify
+{
+    @ApiProperty({description:`
+           if true you can do any modification to team and sub teams 
+           can add a sub team
+           can't add a team
+           can't do any modification to community 
+        `})
+    public CanModify: boolean = false;
 }

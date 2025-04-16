@@ -4,8 +4,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { ImagesDto } from "src/Common/DTOs/Images.dto";
 import { MediaCreateDto } from "src/Common/DTOs/MediaCreatedto";
 import { TeamCardDto } from "src/Teams/Dtos/TeamCard.dto";
+import { ICanModify } from "src/Common/Generic/Contracts/ICanModify";
 
-export class CommunityDto {
+export class CommunityDto
+{
 
     @AutoMap()
     @ApiProperty()
@@ -46,4 +48,15 @@ export class CommunityDto {
     @AutoMap()
     @ApiProperty()
     CreatedAt: Date
+}
+
+export class CommunityWithCanModifyDto extends CommunityDto implements ICanModify
+{
+    @ApiProperty({description:`
+        if true you can do any modification to community, team and sub teams 
+        can't add community 
+        can add a sub team
+        can add a team
+    `})
+    public CanModify: boolean;
 }

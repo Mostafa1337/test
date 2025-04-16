@@ -16,7 +16,7 @@ import { IFileService } from "src/Common/FileUpload/IFile.service";
 import { CommunityLogoFileOptions } from "src/Common/FileUpload/FileTypes/CommunityLogo.file";
 import { CommunitiesConstants } from "../CommunitiesConstants";
 import { CommunityImagesFileOptions } from "src/Common/FileUpload/FileTypes/CommunityImages.file";
-import { CommunityDto } from "../Dtos/Community.dto";
+import { CommunityDto, CommunityWithCanModifyDto } from "../Dtos/Community.dto";
 import { CommunityUpdateDto } from "../Dtos/CommunityUpdate.dto";
 import { ICommunitiesService } from "./ICommunities.service";
 import { ImagesDto } from "src/Common/DTOs/Images.dto";
@@ -93,18 +93,18 @@ export class CommunitiesService implements ICommunitiesService {
         return await this.mapper.mapAsync(community,Communities,CommunityDto)
     }
 
-    async VerifyLeaderId(id: string,leaderId:string): Promise<CommunityDto> {
+    async VerifyLeaderId(id: string,leaderId:string): Promise<Communities> {
+        if(!leaderId)
+            throw new NotFoundException("No Community found by id " + id)
+
         const community = await this.repo.FindOne({
             Id:id,
             LeaderId:leaderId
-        },{
-            MediaLinks: true,
-            Images: true
         })
 
         if (!community)
             throw new NotFoundException("No Community found by id " + id)
-        return await this.mapper.mapAsync(community,Communities,CommunityDto)
+        return community
     }
 
     async UpdateCommunities(id: string,dto:CommunityUpdateDto,leaderId:string):Promise<void> {
