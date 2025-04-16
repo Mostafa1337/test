@@ -9,7 +9,7 @@ import { ResponseType } from "src/Common/ResponseType";
 import { CommunitySearchDto } from "../Dtos/CommunitySearch.dto";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
 import { FilesInterceptor } from "@nestjs/platform-express";
-import { CommunityDto } from "../Dtos/Community.dto";
+import { CommunityDto, CommunityWithCanModifyDto } from "../Dtos/Community.dto";
 import { CommunityUpdateDto } from "../Dtos/CommunityUpdate.dto";
 import { CurrentUserDecorator } from "src/AuthModule/CurrentUser.decorator";
 import { TokenPayLoad } from "src/AuthModule/Dtos/TokenPayload";
@@ -19,6 +19,7 @@ import { CommunityImagesFileOptions } from "src/Common/FileUpload/FileTypes/Comm
 import { ImagesDto } from "src/Common/DTOs/Images.dto";
 import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
 import { LogoDto } from "src/Common/DTOs/Logo.dto";
+import { OptionalGuard } from "src/AuthModule/Gaurds/OptionalGuard";
 
 @ApiTags('Communities')
 @Controller("communities")
@@ -70,11 +71,20 @@ export class CommunitiesController {
     @ApiParam({ name: 'id', description: 'Community ID' })
     @ApiResponse({ status: 200, description: 'Community retrieved successfully', type: CommunityDto })
     @ApiResponse({ status: 404, description: 'Community not found' })
+    @UseGuards(OptionalGuard)
     async GetCommunity(
-        @Param("id") id: string
-    ): Promise<ResponseType<CommunityDto>> {
-        const c = await this.service.GetCommunity(id);
-        return new ResponseType<CommunityDto>(200, "Get community successfully", c)
+        @Param("id") id: string,
+        @CurrentUserDecorator() payload: TokenPayLoad
+    ): Promise<ResponseType<CommunityWithCanModifyDto>> {
+        const c = (await this.service.GetCommunity(id))as CommunityWithCanModifyDto;
+        c.CanModify = false;
+        try
+        {
+            await this.service.VerifyLeaderId(id,payload?.UserId)
+            c.CanModify = true;
+        }catch(ex){}
+
+        return new ResponseType<CommunityWithCanModifyDto>(200, "Get community successfully", c)
     }
 
     /**
@@ -142,6 +152,7 @@ export class CommunitiesController {
     @ApiResponse({ status: 400, description: 'Invalid file' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Not Found Community - Not community leader' })
+    @UseGuards(JWTGaurd)
     async UploadLogo(
         @Param("id") id: string,
         @UploadedFiles() files: Express.Multer.File[],
@@ -181,6 +192,7 @@ export class CommunitiesController {
     @ApiResponse({ status: 400, description: 'Invalid files or maximum limit exceeded' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Not Found Community - Not community leader' })
+    @UseGuards(JWTGaurd)
     async UploadImages(
         @Param("id") id: string,
         @UploadedFiles() files: Express.Multer.File[],
