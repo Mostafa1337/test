@@ -1,6 +1,6 @@
 import { CommunityCardDto } from "../Dtos/CommunityCard.dto";
 import { CommunityCreateDto } from "../Dtos/CommunityCreate.dto";
-import { CommunityDto } from "../Dtos/Community.dto";
+import { CommunityDto, CommunityWithCanModifyDto } from "../Dtos/Community.dto";
 import { CommunitySearchDto } from "../Dtos/CommunitySearch.dto";
 import { CommunityUpdateDto } from "../Dtos/CommunityUpdate.dto";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
@@ -9,8 +9,9 @@ import { ImagesDto } from "src/Common/DTOs/Images.dto";
 import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
 import { LogoDto } from "src/Common/DTOs/Logo.dto";
 import { IVerifyLeader } from "src/Common/Generic/Contracts/IVerifyLeader";
+import { Communities } from "../Models/Communities.entity";
 
-export interface ICommunitiesService extends IVerifyLeader<CommunityDto>{
+export interface ICommunitiesService extends IVerifyLeader<Communities>{
     /**
      * Creates a new community
      * @param dataToInsert - The data for creating a new community
