@@ -69,7 +69,7 @@ export class CommunitiesController {
     @Get(":id")
     @ApiOperation({ summary: 'Get community by ID' })
     @ApiParam({ name: 'id', description: 'Community ID' })
-    @ApiResponse({ status: 200, description: 'Community retrieved successfully', type: CommunityDto })
+    @ApiResponse({ status: 200, description: 'Community retrieved successfully', type: CommunityWithCanModifyDto })
     @ApiResponse({ status: 404, description: 'Community not found' })
     @UseGuards(OptionalGuard)
     async GetCommunity(

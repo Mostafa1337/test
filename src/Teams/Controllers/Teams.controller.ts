@@ -8,11 +8,12 @@ import { TokenPayLoad } from "src/AuthModule/Dtos/TokenPayload";
 import { TeamCardDto } from "../Dtos/TeamCard.dto";
 import { TeamCreateDto } from "../Dtos/TeamCreate.dto";
 import { ITeamsService } from "../Services/ITeams.service";
-import { TeamDto } from "../Dtos/Team.dto";
+import { TeamDto, TeamWithCanModifyDto } from "../Dtos/Team.dto";
 import { TeamUpdateDto } from "../Dtos/TeamUpdate.dto";
 import { LogoDto } from "src/Common/DTOs/Logo.dto";
 import { ImagesDto } from "src/Common/DTOs/Images.dto";
 import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
+import { OptionalGuard } from "src/AuthModule/Gaurds/OptionalGuard";
 
 @ApiTags('teams')
 @Controller('communities/:communityId/teams')
@@ -66,14 +67,23 @@ export class TeamsController {
     @ApiOperation({ summary: 'Get team by ID' })
     @ApiParam({name:"communityId" , type:"string", description: "Community id"})
     @ApiParam({ name: 'id', description: 'Team Id' , type:"string"})
-    @ApiResponse({ status: 200, description: 'team retrieved successfully', type: TeamDto })
+    @ApiResponse({ status: 200, description: 'team retrieved successfully', type: TeamWithCanModifyDto })
     @ApiResponse({ status: 404, description: 'team not found' })
+    @UseGuards(OptionalGuard)
     async GetCommunity(
         @Param("communityId") communityId:string,
-        @Param("id") id: string
-    ): Promise<ResponseType<TeamDto>> {
-        const c = await this.service.GetTeam(id,communityId);
-        return new ResponseType<TeamDto>(200, "Get team successfully", c)
+        @Param("id") id: string,
+        @CurrentUserDecorator() payload:TokenPayLoad
+    ): Promise<ResponseType<TeamWithCanModifyDto>> {
+        const c = (await this.service.GetTeam(id,communityId)) as TeamWithCanModifyDto;
+        c.CanModify = false;
+        try
+        {
+            await this.service.VerifyLeaderId(id,payload?.UserId)
+            c.CanModify = true;
+        }catch(ex){}
+
+        return new ResponseType<TeamWithCanModifyDto>(200, "Get team successfully", c)
     }
 
     /**

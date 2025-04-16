@@ -52,6 +52,11 @@ export class CommunityDto
 
 export class CommunityWithCanModifyDto extends CommunityDto implements ICanModify
 {
-    @ApiProperty()
-    CanModify: boolean;
+    @ApiProperty({description:`
+        if true you can do any modification to community, team and sub teams 
+        can't add community 
+        can add a sub team
+        can add a team
+    `})
+    public CanModify: boolean;
 }
