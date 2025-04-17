@@ -2,7 +2,7 @@ import { ConflictException, NotFoundException } from "@nestjs/common";
 import { EntityBase } from "../EntityBase";
 import { IGenericRepo } from "./Contracts/IGenericRepo";
 import { IGenericService } from "./Contracts/IGenericService";
-import { FindOptionsWhere } from "typeorm";
+import { FindOptionsRelations, FindOptionsWhere } from "typeorm";
 
 export abstract class GenericService<T extends EntityBase> implements IGenericService<T>
 {
@@ -19,10 +19,10 @@ export abstract class GenericService<T extends EntityBase> implements IGenericSe
     FindAllPaginated() {
         throw new Error("Method not implemented.");
     }
-    async FindOne(options: FindOptionsWhere<T> | FindOptionsWhere<T>[],throwErrorIfNull:boolean=true):Promise<T> {
+    async FindOne(options: FindOptionsWhere<T> | FindOptionsWhere<T>[],throwErrorIfNull:boolean=true,relations?: FindOptionsRelations<T>):Promise<T> {
         try
         {
-            const data= await this.repo.FindOne(options);
+            const data= await this.repo.FindOne(options,relations);
             if(throwErrorIfNull && !data)
             {
                 throw new NotFoundException();
