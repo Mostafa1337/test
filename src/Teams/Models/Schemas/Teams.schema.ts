@@ -61,6 +61,7 @@ export class TeamsSchema extends Schema<Teams> {
                     type: "many-to-one",
                     target: Users.name,
                     joinColumn: { name: GetKey<Teams>("LeaderId"),referencedColumnName:GetKey<Users>("Id") }, 
+                    inverseSide:GetKey<Users>("TeamActiveLeaders"),
                     onDelete: "RESTRICT",
                 },
                 Community: {
