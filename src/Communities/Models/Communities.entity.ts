@@ -5,6 +5,7 @@ import { CommunitiesImages } from "./CommunitiesImages.entity";
 import { CommunitiesMedia } from "./CommunitiesMedia.entity";
 import { CommunitiesConstants } from "../CommunitiesConstants";
 import { Teams } from "src/Teams/Models/Teams.entity";
+import { SubTeams } from "src/SubTeams/Models/SubTeams.entity";
 
 export class Communities extends EntityBase {
 
@@ -37,4 +38,7 @@ export class Communities extends EntityBase {
 
     @AutoMap(() => [Teams])
     Teams?: Teams[]
+
+    @AutoMap(() => [SubTeams])
+    SubTeams?: SubTeams[]
 }

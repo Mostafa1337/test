@@ -50,7 +50,7 @@ export class CommunitiesSchema extends Schema<Communities> {
                     type: "many-to-one",
                     target: Users.name,
                     joinColumn: { name: GetKey<Communities>("LeaderId"),referencedColumnName:GetKey<Users>("Id") }, 
-                    inverseSide: GetKey<Users>("Communities"),
+                    inverseSide: GetKey<Users>("CommunityLeaders"),
                     onDelete: "RESTRICT",
                 },
                 MediaLinks: {
