@@ -2,10 +2,7 @@ import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class UserPreviewDto {
-    @ApiProperty({
-        name: "FirstName",
-        type: "string",
-    })
+    @ApiProperty()
     @AutoMap()
     FirstName: string
 
@@ -16,5 +13,17 @@ export class UserPreviewDto {
     constructor(FirstName: string, ProfilePhoto: string) {
         this.FirstName = FirstName
         this.ProfilePhoto = ProfilePhoto
+    }
+}
+
+export class UserPreviewWithEmailDto extends UserPreviewDto {
+    @ApiProperty()
+    @AutoMap()
+    Email: string
+
+    constructor(FirstName: string, ProfilePhoto: string,Email:string) {
+        super(FirstName,ProfilePhoto)
+
+        this.Email = Email
     }
 }

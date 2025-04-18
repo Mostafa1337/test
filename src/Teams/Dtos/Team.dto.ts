@@ -7,6 +7,7 @@ import { TeamChannelDto } from "./TeamChannel";
 import { TeamAchievementDto } from "./TeamAchievement";
 import { TeamLeaderDto } from "./TeamLeader";
 import { ICanModify } from "src/Common/Generic/Contracts/ICanModify";
+import { UserPreviewWithEmailDto } from "src/Users/Dtos/UserPreview.dto";
 
 export class TeamDto {
 
@@ -57,6 +58,10 @@ export class TeamDto {
     @AutoMap()
     @ApiProperty()
     CreatedAt: Date
+
+    @ApiProperty()
+    @AutoMap(()=> UserPreviewWithEmailDto)
+    Leader:UserPreviewWithEmailDto
 }
 
 export class TeamWithCanModifyDto extends TeamDto implements ICanModify
