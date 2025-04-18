@@ -7,7 +7,7 @@ import { SubTeamChannelChats } from "./Models/SubTeamChannelChats.entity";
 import { SubTeamChannels } from "./Models/SubTeamChannels.entity";
 import { ISubTeamsServiceProvider } from "./Services/ISubTeams.service";
 import { UsersModule } from "src/Users/Users.module";
-import { SubTeamsProfile } from "./Controllers/SubTeams.profile";
+//import { SubTeamsProfile } from "./Controllers/SubTeams.profile";
 import { SubTeamMembers } from "./Models/SubTeamMembers.entity";
 import { ISubTeamsMembersServiceProvider } from "./Services/ISubTeamMembers.service";
 
@@ -17,6 +17,6 @@ import { ISubTeamsMembersServiceProvider } from "./Services/ISubTeamMembers.serv
        UsersModule
     ],
     // controllers:[TeamsController,TeamAchievementController,TeamImagesGet],
-    providers:[ISubTeamsServiceProvider,ISubTeamsMembersServiceProvider,SubTeamsProfile],
+    providers:[ISubTeamsServiceProvider,ISubTeamsMembersServiceProvider],
 })
 export class SubTeamsModule{}
