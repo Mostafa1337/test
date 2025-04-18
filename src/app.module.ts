@@ -11,6 +11,7 @@ import { EventsModule } from './Infrastructure/Events/Events.module';
 import { FileModule } from './Common/FileUpload/File.Module';
 import { CommunitiesModule } from './Communities/Communities.module';
 import { TeamsModule } from './Teams/Teams.module';
+import { AppController } from './App.controller';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { TeamsModule } from './Teams/Teams.module';
     CommunitiesModule,
     TeamsModule
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule { }
