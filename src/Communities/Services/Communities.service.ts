@@ -69,15 +69,15 @@ export class CommunitiesService implements ICommunitiesService {
         community.Name = dataToInsert.Name.trim()
         community.LeaderId = user.Id
 
-        const addedCommunities: Communities = await this.repo.Insert(community);
+        const addedCommunities: Communities = await this.repo.Insert(community,{Leader:true});
         return await this.mapper.mapAsync(addedCommunities, Communities, CommunityCardDto)
     }
 
     async GetCards(dto: CommunitySearchDto): Promise<PaginationResponce<CommunityCardDto>> {
-        const communitites = await this.repo.FindAllPaginated({ Name: Like(`%${dto?.Name}%`) }, {}, dto)
+        const communities = await this.repo.FindAllPaginated({ Name: Like(`%${dto?.Name}%`) }, {Leader:true}, dto)
         return new PaginationResponce<CommunityCardDto>(
-            await this.mapper.mapArrayAsync(communitites.Data, Communities, CommunityCardDto),
-            communitites.Count
+            await this.mapper.mapArrayAsync(communities.Data, Communities, CommunityCardDto),
+            communities.Count
         )
     }
 
@@ -85,7 +85,8 @@ export class CommunitiesService implements ICommunitiesService {
         const community = await this.repo.FindById(id,{
             MediaLinks: true,
             Images: true,
-            Teams:true
+            Teams:true,
+            Leader:true
         })
 
         if (!community)

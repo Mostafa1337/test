@@ -1,5 +1,6 @@
 import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
+import { UserPreviewWithEmailDto } from "src/Users/Dtos/UserPreview.dto";
 
 export class CommunityCardDto
 {
@@ -21,4 +22,8 @@ export class CommunityCardDto
 
     @ApiProperty()
     MembersCount:number = 0
+
+    @ApiProperty()
+    @AutoMap(()=> UserPreviewWithEmailDto)
+    Leader:UserPreviewWithEmailDto
 }
