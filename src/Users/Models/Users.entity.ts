@@ -3,6 +3,8 @@ import { Usertypes } from "./Usertype";
 import { AutoMap } from "@automapper/classes";
 import { AfterLoad } from "typeorm";
 import { Communities } from "src/Communities/Models/Communities.entity";
+import { SubTeamMembers } from "src/SubTeams/Models/SubTeamMembers.entity";
+import { Teams } from "src/Teams/Models/Teams.entity";
 
 export class Users extends EntityBase {
 
@@ -37,5 +39,11 @@ export class Users extends EntityBase {
     VerifyDate?:Date = null
 
     @AutoMap()
-    Communities?:Communities[] 
+    CommunityLeaders?:Communities[] 
+
+    @AutoMap()
+    TeamActiveLeaders?:Teams[] 
+
+    @AutoMap()
+    SubTeams?:SubTeamMembers[] 
 }

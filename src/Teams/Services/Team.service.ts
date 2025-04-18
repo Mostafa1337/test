@@ -59,8 +59,8 @@ export class TeamService implements ITeamsService {
 
         const teams: Teams[] = await this.teamRepo.FindAll(
             [
-                { Name: Raw(alias => `LOWER(${alias}) = LOWER(:name)`, { name: dataToInsert.Name.toLowerCase() }) },
-                { LeaderId: user.Id }
+                { Name: Raw(alias => `LOWER(${alias}) = LOWER(:name)`, { name: dataToInsert.Name.toLowerCase() }) ,CommunityId:communityId},
+                { LeaderId: user.Id,CommunityId:communityId }
             ]
         );
         for (const team of teams) {
@@ -88,10 +88,12 @@ export class TeamService implements ITeamsService {
         return await this.mapper.mapAsync(addedTeam, Teams, TeamCardDto)
     }
 
+    //TODO paginate the leaders with separate endpoint
+    //TODO paginate the Achievements with separate endpoint
     async GetTeam(id: string, communityId: string, includeChannels: boolean = true): Promise<TeamDto> {
         const team = await this.teamRepo.FindOne(
             {CommunityId:communityId,Id:id},
-            { Channels: includeChannels, Images: true, MediaLinks: true, Achievements: true, Leaders: { Leader: true } }
+            { Channels: includeChannels, Images: true, MediaLinks: true, Achievements: true, Leaders: { Leader: true }, Leader:true }
         );
 
         if (team === null) {
@@ -105,7 +107,7 @@ export class TeamService implements ITeamsService {
         //First checks if the community already exist
         const community = await this.communityService.GetCommunity(communityId);
 
-        const team: Teams[] = await this.teamRepo.FindAll({ CommunityId: community.Id })
+        const team: Teams[] = await this.teamRepo.FindAll({ CommunityId: community.Id },{Leader:true})
 
         return await this.mapper.mapArrayAsync(team, Teams, TeamCardDto)
     }

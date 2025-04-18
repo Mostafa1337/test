@@ -5,6 +5,7 @@ import { ImagesDto } from "src/Common/DTOs/Images.dto";
 import { MediaCreateDto } from "src/Common/DTOs/MediaCreatedto";
 import { TeamCardDto } from "src/Teams/Dtos/TeamCard.dto";
 import { ICanModify } from "src/Common/Generic/Contracts/ICanModify";
+import { UserPreviewWithEmailDto } from "src/Users/Dtos/UserPreview.dto";
 
 export class CommunityDto
 {
@@ -48,6 +49,10 @@ export class CommunityDto
     @AutoMap()
     @ApiProperty()
     CreatedAt: Date
+
+    @ApiProperty()
+    @AutoMap(()=> UserPreviewWithEmailDto)
+    Leader:UserPreviewWithEmailDto
 }
 
 export class CommunityWithCanModifyDto extends CommunityDto implements ICanModify
