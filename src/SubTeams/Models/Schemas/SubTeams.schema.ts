@@ -5,6 +5,8 @@ import { Communities } from "src/Communities/Models/Communities.entity";
 import { SubTeamImages } from "../SubTeamImages.entity";
 import { SubTeamChannels } from "../SubTeamChannels.entity";
 import { SubTeamsMedia } from "../SubTeamsMedia.entity";
+import { Teams } from "src/Teams/Models/Teams.entity";
+import { SubTeamMembers } from "../SubTeamMembers.entity";
 
 export class SubTeamsSchema extends Schema<SubTeams> {
     constructor() {
@@ -27,7 +29,7 @@ export class SubTeamsSchema extends Schema<SubTeams> {
                     length: 80,
                     nullable: true,
                 },
-                Logo:{
+                Logo: {
                     type: "varchar",
                     length: 255,
                     nullable: true,
@@ -47,9 +49,9 @@ export class SubTeamsSchema extends Schema<SubTeams> {
                     length: 32,
                     nullable: false,
                 },
-                JoinLink:{
+                JoinLink: {
                     type: "varchar",
-                    length: 255,
+                    length: 500,
                     nullable: true,
                 },
                 LearningPhaseTitle: {
@@ -62,32 +64,44 @@ export class SubTeamsSchema extends Schema<SubTeams> {
                     length: 325,
                     nullable: true,
                 },
-            },            
+            },
             relations: {
                 Community: {
                     type: "many-to-one",
                     target: Communities.name,
-                    joinColumn: { name: GetKey<SubTeams>("CommunityId"),referencedColumnName:GetKey<Communities>("Id") }, 
+                    joinColumn: { name: GetKey<SubTeams>("CommunityId"), referencedColumnName: GetKey<Communities>("Id") },
                     onDelete: "RESTRICT",
                 },
                 MediaLinks: {
                     type: "one-to-many",
                     target: SubTeamsMedia.name,
-                    inverseSide:GetKey<SubTeamsMedia>("SubTeam"),
+                    inverseSide: GetKey<SubTeamsMedia>("SubTeam"),
                     onDelete: "CASCADE",
                 },
-                Images:{
+                Images: {
                     type: "one-to-many",
                     target: SubTeamImages.name,
-                    inverseSide:GetKey<SubTeamImages>("SubTeam"),
+                    inverseSide: GetKey<SubTeamImages>("SubTeam"),
                     onDelete: "RESTRICT",
                 },
-                Channels:{
+                Channels: {
                     type: "one-to-many",
                     target: SubTeamChannels.name,
-                    inverseSide:GetKey<SubTeamChannels>("SubTeam"),
+                    inverseSide: GetKey<SubTeamChannels>("SubTeam"),
                     onDelete: "CASCADE",
-                }
+                },
+                Team: {
+                    type: "many-to-one",
+                    target: Teams.name,
+                    joinColumn: { name: GetKey<SubTeams>("TeamId"), referencedColumnName: GetKey<Teams>("Id") },
+                    onDelete: "CASCADE",
+                },
+                Members: {
+                    type: "one-to-many",
+                    target: SubTeamMembers.name,
+                    inverseSide: GetKey<SubTeamMembers>("SubTeam"),
+                    onDelete: "CASCADE",
+                },
             },
         })
     }

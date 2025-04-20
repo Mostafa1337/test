@@ -8,6 +8,7 @@ import { TeamAchievementDto } from "./TeamAchievement";
 import { TeamLeaderDto } from "./TeamLeader";
 import { ICanModify } from "src/Common/Generic/Contracts/ICanModify";
 import { UserPreviewWithEmailDto } from "src/Users/Dtos/UserPreview.dto";
+import { SubTeamCardDto } from "src/SubTeams/Dtos/SubTeamCard.dto";
 
 export class TeamDto {
 
@@ -62,6 +63,10 @@ export class TeamDto {
     @ApiProperty()
     @AutoMap(()=> UserPreviewWithEmailDto)
     Leader:UserPreviewWithEmailDto
+
+    @ApiProperty()
+    @AutoMap(()=> SubTeamCardDto)
+    SubTeams:SubTeamCardDto
 }
 
 export class TeamWithCanModifyDto extends TeamDto implements ICanModify

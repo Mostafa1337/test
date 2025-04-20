@@ -12,6 +12,7 @@ import { FileModule } from './Common/FileUpload/File.Module';
 import { CommunitiesModule } from './Communities/Communities.module';
 import { TeamsModule } from './Teams/Teams.module';
 import { AppController } from './App.controller';
+import { SubTeamsModule } from './SubTeams/SubTeams.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { AppController } from './App.controller';
     NotificationModule,
     EventsModule,
     CommunitiesModule,
-    TeamsModule
+    TeamsModule,
+    SubTeamsModule
   ],
   controllers: [AppController],
   providers: [],

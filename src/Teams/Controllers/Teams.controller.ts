@@ -36,14 +36,14 @@ export class TeamsController {
     @ApiResponse({ status: HttpStatus.CREATED, description: 'Team created successfully', type: TeamCardDto })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Bad Request or super admin tries to be the leader' })
     @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
-    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'The community deosnt exist or the user is not authorized' })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'The community doesn`t exist or the user is not authorized' })
     async AddTeam(
         @Body() dto: TeamCreateDto,
         @Param("communityId") communityId:string,
         @CurrentUserDecorator() user:TokenPayLoad
     ): Promise<ResponseType<TeamCardDto>> {
         const insertedCard = await this.service.Insert(dto,communityId,user.UserId);
-        return new ResponseType<TeamCardDto>(201, "Added community successfully", insertedCard)
+        return new ResponseType<TeamCardDto>(201, "Added team successfully", insertedCard)
     }
 
     /**

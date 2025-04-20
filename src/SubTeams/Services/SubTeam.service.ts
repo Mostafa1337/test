@@ -22,6 +22,7 @@ import { ICommunitiesService } from "src/Communities/Services/ICommunities.servi
 import { SubTeamsConstants } from "../SubTeamsConstants";
 import { SubTeamLogoFileOptions } from "src/Common/FileUpload/FileTypes/SubTeamLogo.file";
 import { SubTeamImagesFileOptions } from "src/Common/FileUpload/FileTypes/SubTeamImages.file";
+import { SubTeamMembers } from "../Models/SubTeamMembers.entity";
 
 
 /**
@@ -40,9 +41,11 @@ export class SubTeamService implements ISubTeamsService {
         @Inject(`REPO_${SubTeamsMedia.name.toUpperCase()}`)
         private readonly mediaRepo: IGenericRepo<SubTeamsMedia>,
 
+        @Inject(`REPO_${SubTeamMembers.name.toUpperCase()}`)
+        private readonly membersRepo: IGenericRepo<SubTeamMembers>,
+
         @Inject(IFileService)
         private readonly fileService: IFileService,
-        private readonly userService: UsersService,
         @InjectMapper()
         private readonly mapper: Mapper,
 
@@ -61,10 +64,12 @@ export class SubTeamService implements ISubTeamsService {
             throw new ConflictException(`Sub team ${dataToInsert.Name} already exist`)
         }
         const newSubTeam: SubTeams = new SubTeams()
-        newSubTeam.Name = newSubTeam.Name
+        newSubTeam.Name = dataToInsert.Name
         newSubTeam.TeamId = team.Id
         newSubTeam.CommunityId = team.CommunityId
-
+        newSubTeam.JoinLink = dataToInsert.JoinLink
+        newSubTeam.LearningPhaseTitle = "Learning Phase"
+        
         await this.repo.Insert(newSubTeam);
 
         return await this.mapper.mapAsync(newSubTeam, SubTeams, SubTeamCardDto)
@@ -72,8 +77,8 @@ export class SubTeamService implements ISubTeamsService {
 
     async GetSubTeam(dto: SubTeamSearchId): Promise<SubTeamDto> {
         const subTeam = await this.repo.FindOne(
-            { CommunityId: dto.CommunityId, TeamId: dto.teamId, Id: dto.teamId },
-            { Images: true, MediaLinks: true, Channels: true }
+            { CommunityId: dto.communityId, TeamId: dto.teamId, Id: dto.subTeamId,Members:{IsHead:true,LeaveDate:IsNull()} },
+            { Images: true, MediaLinks: true, Channels: true, Members:{User:true} }
         )
 
         if (subTeam === null) {
@@ -104,8 +109,8 @@ export class SubTeamService implements ISubTeamsService {
         return await this.mapper.mapArrayAsync(subTeams, SubTeams, SubTeamCardDto)
     }
 
-    async UpdateTeam(searchDto: SubTeamSearchId, dto: SubTeamUpdateDto, leaderId: string): Promise<void> {
-        const subTeam: SubTeams = await this.VerifyLeaderId(searchDto.SubTeamId, leaderId);
+    async Update(searchDto: SubTeamSearchId, dto: SubTeamUpdateDto, leaderId: string): Promise<void> {
+        const subTeam: SubTeams = await this.VerifyLeaderId(searchDto.subTeamId, leaderId);
         subTeam.Desc = dto.Desc
         subTeam.DescShort = dto.DescShort
         subTeam.Vision = dto.Vision
@@ -122,8 +127,8 @@ export class SubTeamService implements ISubTeamsService {
 
     async UpdateCore(searchDto: SubTeamSearchId, dto: SubTeamCreateDto, leaderId: string): Promise<void> {
         const subTeam = await this.repo.FindOne([
-            { CommunityId: searchDto.CommunityId, Community: { LeaderId: leaderId }, TeamId: searchDto.teamId, Id: searchDto.SubTeamId },
-            { CommunityId: searchDto.CommunityId, Team: { LeaderId: leaderId }, TeamId: searchDto.teamId, Id: searchDto.SubTeamId }
+            { CommunityId: searchDto.communityId, Community: { LeaderId: leaderId }, TeamId: searchDto.teamId, Id: searchDto.subTeamId },
+            { CommunityId: searchDto.communityId, Team: { LeaderId: leaderId }, TeamId: searchDto.teamId, Id: searchDto.subTeamId }
         ], { Team: true, Community: true })
 
         const subTeamsWithSameName: SubTeams[] = await this.repo.FindAll(
@@ -136,11 +141,13 @@ export class SubTeamService implements ISubTeamsService {
             throw new ConflictException(`Sub team ${dto.Name} already exist`)
         }
         subTeam.Name = dto.Name
+        subTeam.JoinLink = dto.JoinLink
+
         await this.repo.Update(subTeam.Id, subTeam);
     }
 
     async AddLogo(searchDto: SubTeamSearchId, files: Express.Multer.File, leaderId: string): Promise<LogoDto> {
-        const subTeam = await this.VerifyLeaderId(searchDto.SubTeamId, leaderId);
+        const subTeam = await this.VerifyLeaderId(searchDto.subTeamId, leaderId);
 
         const fileUpload = await this.fileService.Update(
             files, SubTeamLogoFileOptions,
@@ -155,7 +162,7 @@ export class SubTeamService implements ISubTeamsService {
     }
 
     async AddImages(searchDto: SubTeamSearchId, files: Express.Multer.File[], dto: ImageCreateDto, leaderId: string): Promise<ImagesDto[]> {
-        const subTeams = await this.VerifyLeaderId(searchDto.SubTeamId, leaderId);
+        const subTeams = await this.VerifyLeaderId(searchDto.subTeamId, leaderId);
 
         const subTeamImagesCount: number = await this.imagesRepo.Repo.countBy({ SubTeamId: subTeams.Id });
         if (subTeamImagesCount >= 10 || subTeamImagesCount + files.length > 10) {
@@ -196,15 +203,17 @@ export class SubTeamService implements ISubTeamsService {
 
     async VerifyLeaderId(Id: string, userId: string): Promise<SubTeams> {
         const subTeam: SubTeams = await this.repo.FindOne(
-            { Id: Id, Members: { IsHead: true,LeaveDate:IsNull() } },
-            { Community: true, Team: true, Members: true })
+            { Id: Id },
+            { Community: true, Team: true })
+            
         if (subTeam === null) {
-            throw new NotFoundException("Team Not Found")
+            throw new NotFoundException("Sub Team Not Found")
         }
 
-        const isHeadExist: boolean = subTeam.Members.filter(x => x.UserId === userId).length > 0;
-        if (subTeam.Team.LeaderId !== userId && subTeam.Community.LeaderId !== userId && !isHeadExist) {
-            throw new NotFoundException("Team Not Found")
+        const headMember:SubTeamMembers = await this.membersRepo.FindOne({IsHead:true,UserId:userId,LeaveDate:IsNull()})
+
+        if (subTeam.Team.LeaderId !== userId && subTeam.Community.LeaderId !== userId && !headMember) {
+            throw new NotFoundException("Sub Team Not Found")
         }
 
         return subTeam;

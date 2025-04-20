@@ -1,13 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsBoolean, IsDateString, IsEmail } from "class-validator"
 
 export class AddMemberDto
 {
     @ApiProperty()
-    public UserId:string
+    @IsEmail()
+    public UserEmail:string
 
     @ApiProperty()
-    public IsHead:boolean
+    @IsBoolean()
+    public IsHead:boolean = false
 
     @ApiProperty()
-    public JoiDate:Date
+    @IsDateString()
+    public JoinDate:Date = new Date()
 }

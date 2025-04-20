@@ -7,16 +7,20 @@ import { SubTeamChannelChats } from "./Models/SubTeamChannelChats.entity";
 import { SubTeamChannels } from "./Models/SubTeamChannels.entity";
 import { ISubTeamsServiceProvider } from "./Services/ISubTeams.service";
 import { UsersModule } from "src/Users/Users.module";
-//import { SubTeamsProfile } from "./Controllers/SubTeams.profile";
 import { SubTeamMembers } from "./Models/SubTeamMembers.entity";
 import { ISubTeamsMembersServiceProvider } from "./Services/ISubTeamMembers.service";
+import { SubTeamsController } from "./Controllers/SubTeams.controller";
+import { TeamsModule } from "src/Teams/Teams.module";
+import { SubTeamsProfile } from "./Controllers/SubTeams.profile";
+import { SubTeamImagesGet } from "./Controllers/SubTeamImagesGet.controller";
+import { SubTeamMembersController } from "./Controllers/SubTeamMembers.controller";
 
 @Module({
     imports:[
        DatabaseModule.forFeature([SubTeams,SubTeamsMedia,SubTeamImages,SubTeamMembers,SubTeamChannelChats,SubTeamChannels]),
-       UsersModule
+       UsersModule,TeamsModule
     ],
-    // controllers:[TeamsController,TeamAchievementController,TeamImagesGet],
-    providers:[ISubTeamsServiceProvider,ISubTeamsMembersServiceProvider],
+    controllers:[SubTeamsController, SubTeamImagesGet, SubTeamMembersController],
+    providers:[ISubTeamsServiceProvider,ISubTeamsMembersServiceProvider,SubTeamsProfile],
 })
 export class SubTeamsModule{}

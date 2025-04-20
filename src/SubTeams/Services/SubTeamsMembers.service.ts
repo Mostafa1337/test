@@ -10,71 +10,100 @@ import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto
 import { MemberReturnDto } from "../Dtos/SubTeamMembersDtos/MemberReturn.dto";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
+import { MemberSearchDto } from "../Dtos/SubTeamMembersDtos/MemberSearch.dto";
+import { FindOptionsOrder, FindOptionsWhere, ILike, IsNull, Not } from "typeorm";
+import { JoinLinkDto } from "../Dtos/SubTeamMembersDtos/JoinLink.dto";
+import { Users } from "src/Users/Models/Users.entity";
 
 //TODO make rule for the verify if the member IsHead
 /**
  * @implements {ISubTeamsMembersService}
  */
 export class SubTeamsMembersService implements ISubTeamsMembersService {
+
     @Inject(ISubTeamsService)
     private readonly subTeamService: ISubTeamsService;
 
     @Inject(`REPO_${SubTeamMembers.name.toUpperCase()}`)
     private readonly membersRepo: IGenericRepo<SubTeamMembers>;
 
+    @Inject(UsersService)
     private readonly userService: UsersService;
 
     @InjectMapper()
     private readonly mapper: Mapper;
 
-    async AddMember(subTeamId: string, userId: string, isHead: boolean = false, joinDate: Date = null, leaderId: string): Promise<void> {
-        const newMember = new SubTeamMembers();
-        let subTeam: SubTeams
-        if (!leaderId) {
-            subTeam = await this.subTeamService.GetSubTeamById(subTeamId)
-            newMember.IsHead = false;
-            newMember.JoinDate = null;
-        } else {
-            subTeam = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId)
-            newMember.IsHead = isHead;
-            newMember.JoinDate = joinDate;
-        }
-        const user = await this.userService.FindOne({ Id: userId }, true, { CommunityLeaders: true, TeamActiveLeaders: true })
-        if (user.IsSuperAdmin) {
-            throw new BadRequestException("Super admin can't join")
-        }
-        if (user.CommunityLeaders.length > 0) {
-            throw new BadRequestException("Community leaders can't join")
-        }
-        if (user.TeamActiveLeaders.filter(x => x.LeaderId = userId).length > 0) {
-            throw new BadRequestException(`Team leaders of this community can't join`)
-        }
+    async Join(subTeamId: string, userId: string): Promise<JoinLinkDto> {
+        const user:Users = await this.userService.FindOne({ Id: userId }, true, { CommunityLeaders: true, TeamActiveLeaders: true })
+        const subTeam: SubTeams = await this.subTeamService.GetSubTeamById(subTeamId)
 
-        const isExist = await this.membersRepo.FindOne({ SubTeamId: subTeamId, UserId: userId })
-        if (isExist) {
-            throw new ConflictException("This user already exist")
-        }
-        newMember.UserId = userId;
-        newMember.SubTeamId = subTeamId
-        await this.membersRepo.Insert(newMember)
+        await this.AddMemberBasic(user,subTeam)
+
+        return new JoinLinkDto(subTeam.JoinLink)
     }
 
-    async UpdateHead(subTeamId: string, userId: string, leaderId: string): Promise<void> {
+    async AddMember(subTeamId: string, userEmail: string, isHead: boolean = false, joinDate: Date = new Date(), leaderId: string): Promise<void> {
+        const subTeam: SubTeams = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId)
+        const user:Users = await this.userService.FindOne({ Email: userEmail }, true, { CommunityLeaders: true, TeamActiveLeaders: true })
+
+        const joinLik:boolean = await this.AddMemberBasic(user,subTeam,isHead,joinDate);
+        if(!joinLik)
+        {
+            throw new ConflictException("User already exist and need to be accepted")
+        }
+    }
+
+    /**
+     * 
+     * @param user 
+     * @param subTeam 
+     * @returns {boolean} boolean - for successful operation returns true from already exist returns false
+     */
+    async AddMemberBasic( user:Users,subTeam: SubTeams,isHead: boolean = false, joinDate: Date = null) : Promise<boolean>
+    {
+        //get current active sub teams
+        const isExist:SubTeamMembers[] = await this.membersRepo.FindAll({ UserId: user.Id,SubTeam:{CommunityId:subTeam.CommunityId} },{SubTeam:true})
+        const joinLik:JoinLinkDto | SubTeamMembers | null = this.AddAndHeadRule(isExist,subTeam,user);
+
+        const newMember = new SubTeamMembers();
+        newMember.UserId = user.Id;
+        newMember.SubTeamId = subTeam.Id
+        newMember.LeaveDate = null;
+        newMember.JoinDate = null
+        newMember.IsHead = isHead
+        newMember.JoinDate = joinDate
+        
+        if(joinLik instanceof JoinLinkDto)
+        {
+            return false
+        }
+        else if(joinLik instanceof SubTeamMembers)
+        {
+            await this.membersRepo.Update(joinLik.Id,newMember)
+        }
+        else
+        {
+            await this.membersRepo.Insert(newMember)
+        }
+        return true
+    }
+
+    async UpdateHead(subTeamId: string, memberId: string, leaderId: string): Promise<void> {
         const subTeam = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId)
-        const member = await this.membersRepo.FindOne({ SubTeamId: subTeamId, UserId: userId })
+        const member = await this.membersRepo.FindOne({ SubTeamId: subTeamId, Id:memberId, LeaveDate:IsNull() })
         if (!member) {
             throw new NotFoundException("User not found")
         }
 
         if (!member.IsHead) {
-            const user = await this.userService.FindOne({ Id: userId }, true, { CommunityLeaders: true, TeamActiveLeaders: true })
+            const user = await this.userService.FindOne({ Id: member.UserId }, true, { CommunityLeaders: true, TeamActiveLeaders: true })
             if (user.IsSuperAdmin) {
                 throw new BadRequestException("Super admin can't join")
             }
             if (user.CommunityLeaders.length > 0) {
                 throw new BadRequestException("Community leaders can't join")
             }
-            if (user.TeamActiveLeaders.filter(x => x.LeaderId = userId).length > 0) {
+            if (user.TeamActiveLeaders.filter(x => x.LeaderId = member.UserId).length > 0) {
                 throw new BadRequestException(`Team leaders of this community can't join`)
             }
         }
@@ -82,26 +111,157 @@ export class SubTeamsMembersService implements ISubTeamsMembersService {
         await this.membersRepo.Update(member.Id, member)
     }
 
-    async DeleteMember(subTeamId: string, userId: string, leaderId: string): Promise<void> {
+    async Accept(subTeamId: string, memberId: string, leaderId: string): Promise<void> {
         const subTeam = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId)
-        const member = await this.membersRepo.FindOne({ SubTeamId: subTeamId, UserId: userId });
+        const member = await this.membersRepo.FindOne({ SubTeamId: subTeamId, Id:memberId, LeaveDate:IsNull() })
+        if (!member) {
+            throw new NotFoundException("User not found")
+        }
+        if(member.LeaveDate)
+        {
+            throw new BadRequestException("User already left")
+        }else if(member.JoinDate)
+        {
+            throw new ConflictException("User already accepted")
+        }
+        member.JoinDate = new Date()
+        await this.membersRepo.Update(member.Id, member)
+    }
+
+    async DeleteMember(subTeamId: string, memberId: string, leaderId: string): Promise<void> {
+        const subTeam = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId)
+        const member = await this.membersRepo.FindOne({ SubTeamId: subTeamId, Id:memberId });
         if (!member) {
             throw new NotFoundException(`This user is not in ${subTeam.Name} sub team`)
         }
-        if (member.IsAccepted) {
+
+        if(member.LeaveDate)
+        {
+            throw new BadRequestException("This user already left")
+        }
+        else if (member.JoinDate) {
             member.LeaveDate = new Date()
             await this.membersRepo.Update(member.Id, member)
-        } else {
+        }
+        else {
             await this.membersRepo.Delete(member.Id)
         }
     }
 
-    async GetBySubTeam(subTeamId: string, leaderId: string, pagination: Pagination): Promise<PaginationResponce<MemberReturnDto>> {
-        const subTeam = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId)
-        const data: PaginationResponce<SubTeamMembers> = await this.membersRepo.FindAllPaginated({ SubTeamId: subTeamId }, { User: true }, pagination)
-        const dataDto: MemberReturnDto[] = await this.mapper.mapArrayAsync(data.Data, SubTeamMembers, MemberReturnDto);
+    async Leave(subTeamId: string, userId: string): Promise<void> {
+        const subTeam = await this.subTeamService.GetSubTeamById(subTeamId);
+        const member = await this.membersRepo.FindOne({ SubTeamId: subTeamId, UserId:userId });
+        if (!member) {
+            throw new NotFoundException(`This user is not in ${subTeam.Name} sub team`)
+        }
 
-        return new PaginationResponce<MemberReturnDto>(dataDto, data.Count);
+        if(member.LeaveDate)
+        {
+            throw new BadRequestException("This user already left")
+        }
+        else if (member.IsAccepted) {
+            member.LeaveDate = new Date()
+            await this.membersRepo.Update(member.Id, member)
+        }
+        else
+        {
+            throw new BadRequestException("You cant leave before begin accepted")
+        }
     }
 
+    async GetBySubTeam(subTeamId: string, leaderId: string, pagination: MemberSearchDto): Promise<PaginationResponce<MemberReturnDto>> {
+        const subTeam = await this.subTeamService.VerifyLeaderId(subTeamId, leaderId);
+
+        const sort:FindOptionsOrder<SubTeamMembers> = 
+            pagination?.SortField === "Name" ? {User:{FirstName:pagination.SortType}} : {JoinDate:pagination.SortType}
+
+        const [data,count] = 
+            await this.membersRepo.Repo.findAndCount({
+                where:{
+                    SubTeamId:subTeamId,
+                    ...(pagination?.IsAccepted !== null ? {JoinDate:pagination?.IsAccepted ? Not(IsNull()) : IsNull()} : {}),
+                    User:
+                        {
+                            ...(pagination?.UserName !== null ? {FirstName:ILike(`%${pagination.UserName}%`)} : {}),
+                            ...(pagination?.UserEmail !== null ? {Email:ILike(`%${pagination.UserEmail}%`)} : {}),
+                        },
+                        ...(pagination?.IsHead !== null ? {IsHead:pagination.IsHead} : {}),
+                        ...(pagination?.IsLeft !== null ? {LeaveDate:pagination?.IsLeft ? Not(IsNull()) : IsNull()} : {}),
+                } as FindOptionsWhere<SubTeamMembers>,
+                relations:{User:true},
+                skip:(pagination.Page - 1) * pagination.Take,
+                take:pagination.Take,
+                order:sort
+            })
+        
+        const dataDto: MemberReturnDto[] = await this.mapper.mapArrayAsync(data, SubTeamMembers, MemberReturnDto);
+        return new PaginationResponce<MemberReturnDto>(dataDto, count);
+    }
+
+    /**
+     * 
+     * @param isExistMember 
+     * @param subTeam 
+     * @param user 
+     * @returns {JoinLinkDto | SubTeamMembers | null} null to insert {SubTeamMembers} for update
+     */
+    AddAndHeadRule(
+        isExistMember:SubTeamMembers[],
+        subTeam:SubTeams,
+        user:Users
+    ) : JoinLinkDto | SubTeamMembers | null
+    {
+        if (user.IsSuperAdmin) {
+            throw new BadRequestException("Super admin can't join")
+        }
+        if (user.CommunityLeaders.length > 0) {
+            throw new BadRequestException("Community leaders can't join")
+        }
+        if (user.TeamActiveLeaders.filter(x => x.LeaderId = user.Id).length > 0) {
+            throw new BadRequestException(`Team leaders of this community can't join`)
+        }
+
+        const isExistInOtherSubTeam:boolean = isExistMember.filter(x=> !x.LeaveDate && x.SubTeamId !== subTeam.Id).length > 0;
+        if(isExistInOtherSubTeam)
+        {
+            throw new ConflictException(`User already joined sub team`)
+        }
+        const currentSubTeam:SubTeamMembers[] = isExistMember.filter(x=> x.SubTeamId === subTeam.Id);
+
+        if(currentSubTeam.length > 0)
+        {
+            const userMember = currentSubTeam[0]
+            //User left the sub team and requested to join again
+            if(userMember.LeaveDate)
+            {
+                //update leaveDate and join date to nulls
+                return userMember
+            }
+            //User requested to join other sub team when he is already in sub team
+            else if (userMember.JoinDate)
+            {
+                throw new ConflictException("User already exist")
+            }
+            //User Joined for first time then pressed join again JoinDate = null LeaveDate = null
+            else
+            {
+                return new JoinLinkDto(subTeam.JoinLink)  
+            }
+        }
+        //get current active sub team
+        // for(const userMember of isExistMember)
+        // {
+
+        //     //User Joined for first time then pressed join again JoinDate = null LeaveDate = null
+        //     else if(!userMember.JoinDate)
+        //     {
+        //         throw new ConflictException(`This user already requested to join ${userMember.SubTeam.Name} sub team`)
+        //     }
+        //     else if(userMember.JoinDate && !userMember.LeaveDate)
+        //     {
+        //         throw new ConflictException(`This user already joined ${userMember.SubTeam.Name} sub team`)
+        //     }
+        // }
+        return null;
+    }
 }

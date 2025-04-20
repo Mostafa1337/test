@@ -56,7 +56,7 @@ export interface ISubTeamsService extends IVerifyLeader<SubTeams> {
      * @throws {NotFoundException} if sub team is not found or if user is not the community/team/sub team leader
      * @throws {InternalServerErrorException} if update operation fails
      */
-    UpdateTeam(searchDto: SubTeamSearchId, dto: SubTeamUpdateDto, leaderId: string): Promise<void>;
+    Update(searchDto: SubTeamSearchId, dto: SubTeamUpdateDto, leaderId: string): Promise<void>;
 
     /**
      * Updates sub team Name Or Leader
