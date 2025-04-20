@@ -4,6 +4,9 @@ import { ImagesDto } from "../../Common/DTOs/Images.dto";
 import { MediaCreateDto } from "../../Common/DTOs/MediaCreatedto";
 import { ApiProperty } from "@nestjs/swagger";
 import { SubTeamChannelDto } from "./SubTeamChannel";
+import { ICanModify } from "src/Common/Generic/Contracts/ICanModify";
+import { UserPreviewDto } from "src/Users/Dtos/UserPreview.dto";
+import { MemberReturnDto } from "./SubTeamMembersDtos/MemberReturn.dto";
 
 export class SubTeamDto {
 
@@ -43,7 +46,26 @@ export class SubTeamDto {
     @ApiProperty({type:[SubTeamChannelDto]})
     Channels: SubTeamChannelDto[] = []
 
+    @AutoMap(() => [SubTeamChannelDto])
+    @ApiProperty({type:[SubTeamChannelDto]})
+    Leaders: MemberReturnDto[] = []
+
     @AutoMap()
     @ApiProperty()
     CreatedAt: Date
+}
+
+
+export class SubTeamWithCanModifyDto extends SubTeamDto implements ICanModify
+{
+    @ApiProperty({description:`
+        if true you can do any modification to sub teams 
+        can't add community 
+        can't add a sub team
+        can't add a team
+    `})
+    public CanModify: boolean;
+
+    @ApiProperty()
+    JoinLink:string
 }

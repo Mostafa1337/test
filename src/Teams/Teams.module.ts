@@ -23,5 +23,6 @@ import { TeamAchievementController } from "./Controllers/TeamAchievement.control
     ],
     controllers:[TeamsController,TeamAchievementController,TeamImagesGet],
     providers:[ITeamsServiceProvider,ITeamsAchievementServiceProvider,TeamsProfile],
+    exports:[ITeamsServiceProvider]
 })
 export class TeamsModule{}

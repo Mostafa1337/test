@@ -148,6 +148,7 @@ export class GenericRepo<T extends EntityBase> implements IGenericRepo<T> {
     }
 
     private ErrorFactory(err) {
+        console.log(err);
         if (err instanceof QueryFailedError) {
             if (err.driverError.sqlState === '23000') {
                 throw new ConflictException("Duplicate entry")

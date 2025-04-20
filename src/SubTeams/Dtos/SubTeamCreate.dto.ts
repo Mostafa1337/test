@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, MaxLength, IsNotEmpty, Matches } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsString, MaxLength, IsNotEmpty, Matches, IsUrl, IsOptional } from "class-validator";
 
 export class SubTeamCreateDto 
 {
@@ -19,4 +20,18 @@ export class SubTeamCreateDto
         pattern:"/^[a-zA-Z0-9]+$/"
     })
     Name:string;
+
+    @MaxLength(500,{message:"Join Link maximum length is 500"})
+    @IsUrl()
+    @IsOptional()
+    @Transform(({ value }) => value === '' ? null : value)
+    @ApiProperty({
+        name:"JoinLink",
+        maxLength:500,
+        type:"string",
+        nullable:true,
+        required:false,
+        description:"Can be null or url",
+    })
+    JoinLink?:string = null;
 }

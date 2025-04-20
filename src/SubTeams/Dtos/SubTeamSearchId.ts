@@ -1,14 +1,49 @@
+import { IsString } from "class-validator"
+
 export class SubTeamSearchId 
 {
-    public CommunityId: string
+    @IsString()
+    public communityId: string
 
+    @IsString()
     public teamId: string
 
-    public SubTeamId: string
+    @IsString()
+    public subTeamId: string
 
     constructor(CommunityId: string, teamId: string, SubTeamId: string) {
-        this.CommunityId = CommunityId
+        this.communityId = CommunityId
         this.teamId = teamId
-        this.SubTeamId = SubTeamId
+        this.subTeamId = SubTeamId
     }
+}
+
+export class SubTeamSearchIdWithImageId 
+{
+    @IsString()
+    public communityId: string
+
+    @IsString()
+    public teamId: string
+
+    @IsString()
+    public subTeamId: string
+
+    @IsString()
+    public imageid: string
+}
+
+export class SubTeamSearchIdWithUserId 
+{
+    @IsString()
+    public communityId: string
+
+    @IsString()
+    public teamId: string
+
+    @IsString()
+    public subTeamId: string
+
+    @IsString()
+    public memberId: string
 }

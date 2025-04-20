@@ -8,6 +8,7 @@ import { TeamAchievements } from "./TeamAchievements.entity";
 import { Users } from "src/Users/Models/Users.entity";
 import { TeamLeaders } from "./TeamLeaders.entity";
 import { TeamChannels } from "./TeamChannels.entity";
+import { SubTeams } from "src/SubTeams/Models/SubTeams.entity";
 
 export class Teams extends EntityBase {
 
@@ -52,4 +53,7 @@ export class Teams extends EntityBase {
 
     @AutoMap(() => [TeamChannels])
     Channels?: TeamChannels[]
+
+    @AutoMap(() => [SubTeams])
+    SubTeams?: SubTeams[]
 }

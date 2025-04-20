@@ -9,6 +9,7 @@ export abstract class EntityBase{
     Id:string = randomBytes(16).toString("hex");
     
     @Exclude()
+    @AutoMap()
     CreatedAt!:Date;
 
     @Exclude()

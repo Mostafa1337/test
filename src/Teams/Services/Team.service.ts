@@ -93,7 +93,7 @@ export class TeamService implements ITeamsService {
     async GetTeam(id: string, communityId: string, includeChannels: boolean = true): Promise<TeamDto> {
         const team = await this.teamRepo.FindOne(
             {CommunityId:communityId,Id:id},
-            { Channels: includeChannels, Images: true, MediaLinks: true, Achievements: true, Leaders: { Leader: true }, Leader:true }
+            { Channels: includeChannels, Images: true, MediaLinks: true, Achievements: true, Leaders: { Leader: true }, Leader:true,SubTeams:true }
         );
 
         if (team === null) {
