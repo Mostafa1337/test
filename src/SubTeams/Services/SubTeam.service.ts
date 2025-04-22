@@ -76,10 +76,24 @@ export class SubTeamService implements ISubTeamsService {
     }
 
     async GetSubTeam(dto: SubTeamSearchId): Promise<SubTeamDto> {
-        const subTeam = await this.repo.FindOne(
-            { CommunityId: dto.communityId, TeamId: dto.teamId, Id: dto.subTeamId,Members:{IsHead:true,LeaveDate:IsNull()} },
-            { Images: true, MediaLinks: true, Channels: true, Members:{User:true} }
-        )
+     const subTeam =  await this.repo.Repo.createQueryBuilder("subTeam")
+                    .leftJoinAndSelect(
+                        "subTeam.Members", 
+                        "member", 
+                        "member.IsHead = :isHead AND member.LeaveDate IS NULL", 
+                        { isHead: true }
+                    )
+                    .leftJoinAndSelect("subTeam.Images", "images")
+                    .leftJoinAndSelect("subTeam.MediaLinks", "mediaLinks")
+                    .leftJoinAndSelect("subTeam.Channels", "channels")
+                    .leftJoinAndSelect("member.User", "user")
+                    .where({
+                        CommunityId: dto.communityId,
+                        TeamId: dto.teamId,
+                        Id: dto.subTeamId
+                    })
+                    .getOne()
+
 
         if (subTeam === null) {
             throw new NotFoundException("Sub team Not Found")
