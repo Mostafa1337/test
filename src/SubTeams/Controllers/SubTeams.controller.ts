@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpStatus, Inject, Param, Patch, Post, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { ISubTeamsService } from "../Services/ISubTeams.service";
+import { ISubTeamsService } from "../Services/SubTeams/ISubTeams.service";
 import { JWTGaurd } from "src/AuthModule/Gaurds/JWT.gaurd";
 import { SubTeamCreateDto } from "../Dtos/SubTeamCreate.dto";
 import { SubTeamParamDecorator, SubTeamParamPipe } from "./SubTeamParam";

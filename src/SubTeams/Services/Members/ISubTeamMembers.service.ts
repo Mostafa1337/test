@@ -1,8 +1,8 @@
 import { SubTeamsMembersService } from "./SubTeamsMembers.service";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
-import { MemberReturnDto } from "../Dtos/SubTeamMembersDtos/MemberReturn.dto";
-import { MemberSearchDto } from "../Dtos/SubTeamMembersDtos/MemberSearch.dto";
-import { JoinLinkDto } from "../Dtos/SubTeamMembersDtos/JoinLink.dto";
+import { MemberReturnDto } from "../../Dtos/SubTeamMembersDtos/MemberReturn.dto";
+import { MemberSearchDto } from "../../Dtos/SubTeamMembersDtos/MemberSearch.dto";
+import { JoinLinkDto } from "../../Dtos/SubTeamMembersDtos/JoinLink.dto";
 
 export interface ISubTeamsMembersService {
     /**

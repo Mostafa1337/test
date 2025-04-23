@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpStatus, Inject, Param, Post, Query, Search, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
-import { ISubTeamsMembersService } from "../Services/ISubTeamMembers.service";
+import { ISubTeamsMembersService } from "../Services/Members/ISubTeamMembers.service";
 import { MemberSearchDto } from "../Dtos/SubTeamMembersDtos/MemberSearch.dto";
 import { SubTeamSearchId, SubTeamSearchIdWithUserId } from "../Dtos/SubTeamSearchId";
 import { SubTeamParamDecorator, SubTeamParamPipe } from "./SubTeamParam";
@@ -25,6 +25,7 @@ export class SubTeamMembersController
 
     @Get()
     @ApiOperation({ summary: 'Get Sub teams paginated' })
+    @ApiOkResponse({type:MemberReturnDto,description:"THIS IS Pagination Response"})
     async GetMembers
     (
         @Query() pagi:MemberSearchDto,
@@ -59,6 +60,7 @@ export class SubTeamMembersController
         and if IsHead = true returns error if the user is team/community leader
         ` })
     @ApiBody({type:AddMemberDto})
+    @ApiOkResponse()
     async AddMember
     (
         @Param(new SubTeamParamPipe()) search:SubTeamSearchId,
@@ -67,7 +69,7 @@ export class SubTeamMembersController
     ) : Promise<ResponseType<void>>
     {
         await this.memberService.AddMember(search.subTeamId,dto.UserEmail,dto.IsHead,dto.JoinDate,user.UserId);
-        return new ResponseType(HttpStatus.CREATED,"User created successfully");
+        return new ResponseType(HttpStatus.OK,"Joined successfully");
     }
 
     @Post(":memberId/accept")
@@ -76,6 +78,7 @@ export class SubTeamMembersController
         Accept member to sub team
         returns error if the member not found or left or has been accepted
         ` })
+    @ApiOkResponse()
     async AcceptMember
     (
         @Param(new SubTeamParamPipe()) search:SubTeamSearchIdWithUserId,
@@ -84,7 +87,7 @@ export class SubTeamMembersController
     ) : Promise<ResponseType<void>>
     {
         await this.memberService.Accept(search.subTeamId,memberId,user.UserId)
-        return new ResponseType(HttpStatus.CREATED,"User accepted successfully");
+        return new ResponseType(HttpStatus.OK,"Accepted successfully");
     }
 
     @Post(":memberId/decline")
@@ -94,6 +97,7 @@ export class SubTeamMembersController
         Note:- it just make the leaveDate = new Date() so the member will be still exist but with leave date != null
         throw error if the user already left
         `})
+    @ApiOkResponse()
     async KickMember
     (
         @Param(new SubTeamParamPipe()) search:SubTeamSearchIdWithUserId,
@@ -102,7 +106,7 @@ export class SubTeamMembersController
     ) : Promise<ResponseType<void>>
     {
         await this.memberService.DeleteMember(search.subTeamId,memberId,user.UserId)
-        return new ResponseType(HttpStatus.CREATED,"User deleted successfully");
+        return new ResponseType(HttpStatus.OK,"Deleted successfully");
     }
 
     @Post(":memberId/head")
@@ -111,6 +115,7 @@ export class SubTeamMembersController
         inverse the already IsHead member status 
         throw error if the user is team/community leader
         `})
+    @ApiOkResponse()
     async UpdateHead
     (
         @Param(new SubTeamParamPipe()) search:SubTeamSearchIdWithUserId,
@@ -119,7 +124,7 @@ export class SubTeamMembersController
     ) : Promise<ResponseType<void>>
     {
         await this.memberService.UpdateHead(search.subTeamId,memberId,user.UserId)
-        return new ResponseType(HttpStatus.CREATED,"User updated successfully");
+        return new ResponseType(HttpStatus.OK,"Updated successfully");
     }
 
     @Post("leave")
@@ -127,6 +132,7 @@ export class SubTeamMembersController
         member want to leave sub team
         throw error if he is not yet accepted or he is already left
         `})
+    @ApiOkResponse()
     async MemberLeave
     (
         @Param(new SubTeamParamPipe()) search:SubTeamSearchId,
@@ -134,6 +140,6 @@ export class SubTeamMembersController
     ) : Promise<ResponseType<void>>
     {
         await this.memberService.Leave(search.subTeamId,user.UserId)
-        return new ResponseType(HttpStatus.CREATED,"User deleted successfully");
+        return new ResponseType(HttpStatus.OK,"Left successfully");
     }
 }

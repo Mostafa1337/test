@@ -1,18 +1,17 @@
 import { IGenericRepo } from "src/Common/Generic/Contracts/IGenericRepo";
-import { SubTeamMembers } from "../Models/SubTeamMembers.entity";
+import { SubTeamMembers } from "../../Models/SubTeamMembers.entity";
 import { ISubTeamsMembersService } from "./ISubTeamMembers.service";
-import { ISubTeamsService } from "./ISubTeams.service";
+import { ISubTeamsService } from "../SubTeams/ISubTeams.service";
 import { BadRequestException, ConflictException, Inject, NotFoundException } from "@nestjs/common";
 import { UsersService } from "src/Users/Services/Users.service";
-import { SubTeams } from "../Models/SubTeams.entity";
-import { Pagination } from "src/Common/Pagination/Pagination";
+import { SubTeams } from "../../Models/SubTeams.entity";
 import { PaginationResponce } from "src/Common/Pagination/PaginationResponce.dto";
-import { MemberReturnDto } from "../Dtos/SubTeamMembersDtos/MemberReturn.dto";
+import { MemberReturnDto } from "../../Dtos/SubTeamMembersDtos/MemberReturn.dto";
 import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
-import { MemberSearchDto } from "../Dtos/SubTeamMembersDtos/MemberSearch.dto";
+import { MemberSearchDto } from "../../Dtos/SubTeamMembersDtos/MemberSearch.dto";
 import { FindOptionsOrder, FindOptionsWhere, ILike, IsNull, Not } from "typeorm";
-import { JoinLinkDto } from "../Dtos/SubTeamMembersDtos/JoinLink.dto";
+import { JoinLinkDto } from "../../Dtos/SubTeamMembersDtos/JoinLink.dto";
 import { Users } from "src/Users/Models/Users.entity";
 
 //TODO make rule for the verify if the member IsHead

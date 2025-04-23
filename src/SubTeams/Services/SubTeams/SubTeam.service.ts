@@ -2,27 +2,26 @@ import { Mapper } from "@automapper/core";
 import { InjectMapper } from "@automapper/nestjs";
 import { IGenericRepo } from "src/Common/Generic/Contracts/IGenericRepo";
 import { IFileService } from "src/Common/FileUpload/IFile.service";
-import { SubTeams } from "../Models/SubTeams.entity";
+import { SubTeams } from "../../Models/SubTeams.entity";
 import { Injectable, Scope, Inject, ConflictException, NotFoundException, InternalServerErrorException, BadRequestException } from "@nestjs/common";
 import { ISubTeamsService } from "./ISubTeams.service";
-import { SubTeamImages } from "../Models/SubTeamImages.entity";
-import { SubTeamsMedia } from "../Models/SubTeamsMedia.entity";
-import { UsersService } from "src/Users/Services/Users.service";
+import { SubTeamImages } from "../../Models/SubTeamImages.entity";
+import { SubTeamsMedia } from "../../Models/SubTeamsMedia.entity";
 import { ImageCreateDto } from "src/Common/DTOs/ImageCreate.dto";
 import { ImagesDto } from "src/Common/DTOs/Images.dto";
 import { LogoDto } from "src/Common/DTOs/Logo.dto";
-import { SubTeamDto } from "../Dtos/SubTeam.dto";
-import { SubTeamCardDto } from "../Dtos/SubTeamCard.dto";
-import { SubTeamCreateDto } from "../Dtos/SubTeamCreate.dto";
-import { SubTeamSearchId } from "../Dtos/SubTeamSearchId";
-import { SubTeamUpdateDto } from "../Dtos/SubTeamUpdate.dto";
+import { SubTeamDto } from "../../Dtos/SubTeam.dto";
+import { SubTeamCardDto } from "../../Dtos/SubTeamCard.dto";
+import { SubTeamCreateDto } from "../../Dtos/SubTeamCreate.dto";
+import { SubTeamSearchId } from "../../Dtos/SubTeamSearchId";
+import { SubTeamUpdateDto } from "../../Dtos/SubTeamUpdate.dto";
 import { ITeamsService } from "src/Teams/Services/ITeams.service";
 import { IsNull, Not, Raw } from "typeorm";
-import { ICommunitiesService } from "src/Communities/Services/ICommunities.service";
-import { SubTeamsConstants } from "../SubTeamsConstants";
+import { SubTeamsConstants } from "../../SubTeamsConstants";
 import { SubTeamLogoFileOptions } from "src/Common/FileUpload/FileTypes/SubTeamLogo.file";
 import { SubTeamImagesFileOptions } from "src/Common/FileUpload/FileTypes/SubTeamImages.file";
-import { SubTeamMembers } from "../Models/SubTeamMembers.entity";
+import { SubTeamMembers } from "../../Models/SubTeamMembers.entity";
+import { CreateLearningPhaseDto } from "src/SubTeams/Dtos/LearningPhase/CreateLearningPhase.dto";
 
 
 /**
@@ -52,6 +51,14 @@ export class SubTeamService implements ISubTeamsService {
         @Inject(ITeamsService)
         private readonly teamService: ITeamsService,
     ) {
+    }
+
+    async UpdateLearningPhase(dto: CreateLearningPhaseDto, subTeamId: string, leaderId: string): Promise<void> {
+        const subTeam: SubTeams = await this.VerifyLeaderId(subTeamId, leaderId);
+        subTeam.LearningPhaseDesc = dto.Desc
+        subTeam.LearningPhaseTitle = dto.Name
+
+        await this.repo.Update(subTeam.Id, subTeam);
     }
 
     async Insert(dataToInsert: SubTeamCreateDto, teamId: string, leaderId: string): Promise<SubTeamCardDto> {
