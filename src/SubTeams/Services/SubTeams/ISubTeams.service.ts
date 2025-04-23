@@ -1,14 +1,15 @@
-import { SubTeamCardDto } from "../Dtos/SubTeamCard.dto";
-import { SubTeamCreateDto } from "../Dtos/SubTeamCreate.dto";
-import { SubTeamDto } from "../Dtos/SubTeam.dto";
-import { ImageCreateDto } from "../../Common/DTOs/ImageCreate.dto";
-import { SubTeamUpdateDto } from "../Dtos/SubTeamUpdate.dto";
-import { ImagesDto } from "../../Common/DTOs/Images.dto";
+import { SubTeamCardDto } from "../../Dtos/SubTeamCard.dto";
+import { SubTeamCreateDto } from "../../Dtos/SubTeamCreate.dto";
+import { SubTeamDto } from "../../Dtos/SubTeam.dto";
+import { ImageCreateDto } from "../../../Common/DTOs/ImageCreate.dto";
+import { SubTeamUpdateDto } from "../../Dtos/SubTeamUpdate.dto";
+import { ImagesDto } from "../../../Common/DTOs/Images.dto";
 import { SubTeamService } from "./SubTeam.service";
 import { LogoDto } from "src/Common/DTOs/Logo.dto";
 import { IVerifyLeader } from "src/Common/Generic/Contracts/IVerifyLeader";
-import { SubTeams } from "../Models/SubTeams.entity";
-import { SubTeamSearchId } from "../Dtos/SubTeamSearchId";
+import { SubTeams } from "../../Models/SubTeams.entity";
+import { SubTeamSearchId } from "../../Dtos/SubTeamSearchId";
+import { CreateLearningPhaseDto } from "src/SubTeams/Dtos/LearningPhase/CreateLearningPhase.dto";
 
 export interface ISubTeamsService extends IVerifyLeader<SubTeams> {
     /**
@@ -99,6 +100,15 @@ export interface ISubTeamsService extends IVerifyLeader<SubTeams> {
      * @throws {NotFoundException} if sub team is not found or if user is not the community/team/sub leader
      */
     DeleteImage(subTeamId: string, imageId: string, leaderId: string): Promise<void>;
+
+    /**
+     * Update the name and the description of the learning phase
+     * @param {CreateLearningPhaseDto} dto 
+     * @param {string} subTeamId - The ID of the sub team
+     * @param {string} leaderId - The ID of the leader performing the update
+     * @throws {NotFoundException} if sub team is not found or if user is not the community/team/sub leader
+     */
+    UpdateLearningPhase(dto:CreateLearningPhaseDto,subTeamId: string,leaderId: string) : Promise<void>
 } 
 
 export const ISubTeamsService = Symbol("ISubTeamsService")

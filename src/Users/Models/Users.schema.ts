@@ -5,6 +5,7 @@ import { Communities } from "src/Communities/Models/Communities.entity";
 import { GetKey } from "src/Common/GetKeyFrom";
 import { SubTeamMembers } from "src/SubTeams/Models/SubTeamMembers.entity";
 import { Teams } from "src/Teams/Models/Teams.entity";
+import { UserProgress } from "src/SubTeams/Models/LearningPhase/UserProgress.entity";
 
 
 // The maximum first name length was 46. I go with 50. (Of course, only 500 of those were over 25, and they were all cases where data imports resulted in extra junk winding up in that field.)
@@ -105,7 +106,13 @@ export class UsersSchema extends Schema<Users> {
                     target: SubTeamMembers.name,
                     inverseSide: GetKey<SubTeamMembers>("User"),
                     onDelete: "CASCADE", 
-                }
+                },
+                UserProgress:{
+                    type: "one-to-many",
+                    target: UserProgress.name,
+                    inverseSide:GetKey<UserProgress>("User"),
+                    onDelete: "CASCADE",
+                },
             },
         })
     }

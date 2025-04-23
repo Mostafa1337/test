@@ -8,6 +8,7 @@ import { Users } from "src/Users/Models/Users.entity";
 import { SubTeamChannels } from "./SubTeamChannels.entity";
 import { Teams } from "src/Teams/Models/Teams.entity";
 import { SubTeamMembers } from "./SubTeamMembers.entity";
+import { LearningPhaseSections } from "./LearningPhase/LearningPhaseSections.entity";
 
 export class SubTeams extends EntityBase {
 
@@ -59,4 +60,7 @@ export class SubTeams extends EntityBase {
     
     @AutoMap(() => [SubTeamMembers])
     Members?: SubTeamMembers[]
+
+    @AutoMap(() => [LearningPhaseSections])
+    LearningPhaseSections?: LearningPhaseSections[]
 }

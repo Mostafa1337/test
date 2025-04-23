@@ -7,6 +7,7 @@ import { SubTeamChannels } from "../SubTeamChannels.entity";
 import { SubTeamsMedia } from "../SubTeamsMedia.entity";
 import { Teams } from "src/Teams/Models/Teams.entity";
 import { SubTeamMembers } from "../SubTeamMembers.entity";
+import { LearningPhaseSections } from "../LearningPhase/LearningPhaseSections.entity";
 
 export class SubTeamsSchema extends Schema<SubTeams> {
     constructor() {
@@ -101,6 +102,12 @@ export class SubTeamsSchema extends Schema<SubTeams> {
                     target: SubTeamMembers.name,
                     inverseSide: GetKey<SubTeamMembers>("SubTeam"),
                     onDelete: "CASCADE",
+                },
+                LearningPhaseSections: {
+                    type: "one-to-many",
+                    target: LearningPhaseSections.name,
+                    inverseSide: GetKey<LearningPhaseSections>("SubTeam"),
+                    onDelete: "RESTRICT",
                 },
             },
         })

@@ -5,6 +5,7 @@ import { AfterLoad } from "typeorm";
 import { Communities } from "src/Communities/Models/Communities.entity";
 import { SubTeamMembers } from "src/SubTeams/Models/SubTeamMembers.entity";
 import { Teams } from "src/Teams/Models/Teams.entity";
+import { UserProgress } from "src/SubTeams/Models/LearningPhase/UserProgress.entity";
 
 export class Users extends EntityBase {
 
@@ -46,4 +47,7 @@ export class Users extends EntityBase {
 
     @AutoMap()
     SubTeams?:SubTeamMembers[] 
+
+    @AutoMap()
+    UserProgress?:UserProgress[] 
 }

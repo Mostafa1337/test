@@ -37,12 +37,33 @@ services:
     networks:
       - backend_net
 
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    mem_limit: 50m
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+    networks:
+      - backend_net
+
 volumes:
   mysql_data:
 
   backendFile:
 
   backendLogs:
+
+  caddy_data:
+  
+  caddy_config:
 
 
 networks:
