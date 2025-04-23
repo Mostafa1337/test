@@ -27,8 +27,14 @@ export class SubTeamMembers extends EntityBase
     SubTeam?:SubTeams
 
     @AutoMap()
-    get IsAccepted()
+    get IsAccepted():boolean
     {
         return this.JoinDate ? true : false;
+    }
+
+    @AutoMap()
+    get IsLeft():boolean
+    {
+        return this.LeaveDate ? true : false;
     }
 }
